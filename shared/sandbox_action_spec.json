@@ -1,0 +1,44 @@
+{
+    "sandbox_actions": [
+        {
+            "action_name": "undo_day",
+            "description": "Undo the last day, reverting to the previous state.",
+            "parameters": {}
+        },
+        {
+            "action_name": "max_money",
+            "description": "Set the park's money to the maximum value ($99,999,999).",
+            "parameters": {}
+        },
+        {
+            "action_name": "max_research",
+            "description": "Unlock all attractions and staff.",
+            "parameters": {}
+        },
+        {
+            "action_name": "set_sandbox_mode",
+            "description": "Set park to sandbox mode with specified number of sandbox steps.",
+            "parameters": {
+                "sandbox_steps": "The number of sandbox steps to allow. Use -1 for unlimited steps."
+            }
+        },
+        {
+            "action_name": "reset",
+            "description": "Reset the park to initial state",
+            "parameters": {}
+        },
+        {
+            "action_name": "change_settings",
+            "description": "Change the park's difficulty and layout settings, and reset the park using the new settings.",
+            "parameters": {
+                "difficulty": "The difficulty level. Must be one of easy or medium",
+                "layout": "The park layout. Must be one of ['diagonal_squares', 'the_ladder', 'two_paths', 'the_line', 'the_fork']."
+            }
+        }
+    ],
+    "param_types": {
+        "sandbox_steps": "number",
+        "difficulty": "string",
+        "layout": "string"
+    }
+}

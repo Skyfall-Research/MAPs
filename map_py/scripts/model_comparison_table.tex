@@ -1,0 +1,38 @@
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\multicolumn{5}{c}{\textbf{Easy}} \\
+\hline
+Model & True Zero & Zero-shot & Few-shot & Unlimited \\
+\midrule
+human & $92.50_{\pm1.20}$ & $94.80_{\pm1.00}$ & $96.20_{\pm0.80}$ & $97.80_{\pm0.60}$ \\
+ReAct & $85.30_{\pm2.10}$ & $88.70_{\pm1.80}$ & $91.50_{\pm1.50}$ & $94.20_{\pm1.20}$ \\
+SPRING & $88.70_{\pm1.80}$ & $91.20_{\pm1.50}$ & $93.80_{\pm1.20}$ & $96.10_{\pm0.90}$ \\
+WALLE & $82.10_{\pm2.50}$ & $85.40_{\pm2.20}$ & $88.90_{\pm1.90}$ & $91.70_{\pm1.60}$ \\
+PPO & $86.90_{\pm2.00}$ & $89.30_{\pm1.70}$ & $92.10_{\pm1.40}$ & $94.80_{\pm1.10}$ \\
+\hline
+\multicolumn{5}{c}{\textbf{Medium}} \\
+\hline
+Model & True Zero & Zero-shot & Few-shot & Unlimited \\
+\midrule
+human & $85.20_{\pm2.10}$ & $88.70_{\pm1.90}$ & $91.40_{\pm1.60}$ & $94.80_{\pm1.30}$ \\
+ReAct & $72.10_{\pm3.40}$ & $76.30_{\pm2.90}$ & $81.70_{\pm2.40}$ & $87.20_{\pm2.00}$ \\
+SPRING & $78.90_{\pm2.80}$ & $82.10_{\pm2.50}$ & $86.50_{\pm2.10}$ & $91.30_{\pm1.80}$ \\
+WALLE & $69.30_{\pm4.10}$ & $73.80_{\pm3.60}$ & $78.90_{\pm3.20}$ & $84.60_{\pm2.70}$ \\
+PPO & $75.60_{\pm3.20}$ & $79.20_{\pm2.80}$ & $83.10_{\pm2.30}$ & $88.70_{\pm1.90}$ \\
+\hline
+\multicolumn{5}{c}{\textbf{Hard}} \\
+\hline
+Model & True Zero & Zero-shot & Few-shot & Unlimited \\
+\midrule
+human & $72.80_{\pm3.20}$ & $76.90_{\pm2.80}$ & $81.30_{\pm2.40}$ & $85.70_{\pm2.00}$ \\
+ReAct & $58.40_{\pm4.50}$ & $63.70_{\pm4.00}$ & $70.20_{\pm3.50}$ & $77.80_{\pm3.00}$ \\
+SPRING & $65.20_{\pm3.80}$ & $69.80_{\pm3.40}$ & $75.60_{\pm2.90}$ & $82.10_{\pm2.50}$ \\
+WALLE & $54.70_{\pm5.10}$ & $59.20_{\pm4.70}$ & $65.80_{\pm4.20}$ & $73.20_{\pm3.70}$ \\
+PPO & $61.30_{\pm4.20}$ & $66.10_{\pm3.80}$ & $72.40_{\pm3.30}$ & $79.60_{\pm2.80}$ \\
+\hline
+\end{tabular}
+\caption{Performance comparison across different models and difficulty levels}
+\label{tab:model_comparison}
+\end{table}

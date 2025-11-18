@@ -1,0 +1,410 @@
+{
+  "panels": {
+    "day_progress_panel": [1003, 3],
+    "top_panel": [1003, 75],
+    "bottom_panel": [1003, 612],
+    "main_stat_panel": [1612, 75],
+    "aggregate_stat_panel": [1612, 455],
+    "playback_panel": [1612, 5],
+    "animate_day": [1770, 10],
+    "updating_day_offset": [128, 128]
+  },
+  "misc_coords": {
+    "playback_increase_offset": [7, 27],
+    "playback_decrease_offset": [7, 44],
+    "playback_text_offset": [50, 25],
+    "alert_textbox": [10, 25],
+    "alert_message_offset": [67, 20],
+    "left_main_button_offset": [650, 860],
+    "right_main_button_offset": [992, 860],
+    "center_main_button_offset": [821, 600]
+  },
+  "top_panel": {
+    "change_price_button_offset": [270, 400],
+    "modify_button_offset": [380, 415],
+    "move_button_offset": [450, 415],
+    "sell_button_offset": [520, 415],
+    "fire_button_offset": [520, 415],
+    "staff_list_panel_offset": [15, -25],
+    "staff_type_offsets": {
+      "janitors": [229, -2],
+      "mechanics": [333, -2],
+      "specialists": [437, -2]
+    },
+    "staff_list_up_button_offset": [280, 45],
+    "staff_list_down_button_offset": [280, 213],
+    "staff_entry_offsets": [[5, 56], [5, 109], [5, 161]],
+    "selected_tile_panel_offset": [15, 218],
+    "change_attributes_box_offsets": [[15, 410], [190, 410]]
+  },
+  "bottom_panel": {
+    "action_type_tabs": {
+      "button_types": ["ride", "shop", "staff", "research", "survey_guests", "terraform", "wait"],
+      "tab_start_x": 10,
+      "tab_spacing": 83,
+      "tab_y": -50
+    },
+    "place_button_offset": [425, 300],
+    "color_selection": {
+      "colors": ["yellow", "blue", "green", "red"],
+      "start_x": 50,
+      "spacing": 45,
+      "y": 315
+    },
+    "subtypes_choices": {
+      "start_x": 75,
+      "spacing": 150,
+      "y": 20,
+      "count": 3
+    },
+    "attributes_box": {
+      "start_x": 30,
+      "start_y": 180,
+      "col_spacing": 180,
+      "row_spacing": 50,
+      "cols": 3,
+      "rows": 2
+    },
+    "description_box_offset": [30, 230],
+    "big_description_box_offset": [30, 180]
+  },
+  "research_tab": {
+    "set_research_button_offset": [425, 300],
+    "speed_choices": {
+      "speeds": ["none", "slow", "medium", "fast"],
+      "start_x": 400,
+      "start_y": 50,
+      "spacing": 60
+    },
+    "entities": {
+      "entity_types": ["carousel", "ferris_wheel", "roller_coaster", "drink", "food", "specialty", "janitor", "mechanic", "specialist"],
+      "start_x": 50,
+      "start_y": 50,
+      "col_spacing": 100,
+      "row_spacing": 100,
+      "cols": 3
+    }
+  },
+  "survey_guests_tab": {
+    "guest_survey_results_panel": [265, 300],
+    "num_guests_input_box_offset": [145, 75],
+    "survey_guests_button_offset": [425, 300],
+    "show_results_button_offset": [275, 300],
+    "guest_survey_up_button_offset": [680, 10],
+    "guest_survey_down_button_offset": [680, 370]
+  },
+  "terraform_tab": {
+    "buttons": {
+      "add": {
+        "path_offset": [150, 35],
+        "water_offset": [150, 205]
+      },
+      "remove": {
+        "path_offset": [325, 35],
+        "water_offset": [325, 205]
+      }
+    }
+  },
+  "wait_tab": {
+    "wait_button_offset": [230, 60],
+    "sandbox_actions_y_offset": 150,
+    "undo_day_button_offset": [85, 175],
+    "max_research_button_offset": [235, 175],
+    "max_money_button_offset": [385, 175],
+    "reset_button_offset": [85, 250],
+    "switch_layouts_button_offset": [235, 250],
+    "done_button_offset": [385, 250],
+    "remaining_days_to_learn_from_y_offset": 310
+  },
+
+  "selection_screen": {
+    "start_button_offset": [823, 675],
+    "choices": {
+      "x_spacing": 50,
+      "y": 250,
+      "textbox_y": 350
+    }
+  },
+  "tutorial_screen": {
+    "mascot": [80, 315],
+    "textbox": [120, 340],
+    "arrow_offset": [-100, 0],
+    "ok_button_offset": [-200, 0],
+    "steps": [
+      {
+        "step_idx": 0,
+        "text": "Welcome!\nIn this game, you will be managing an amusement park.",
+        "highlight_pos": [990, 335],
+        "include_arrow": false,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 1,
+        "text": "The main goal of the game is to maximize your park's value.",
+        "highlight_pos": [1620, 134],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 2,
+        "text": "Let's start by placing a ride.\nNotice that your action tab is currently on 'rides'",
+        "highlight_pos": [1020, 565],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 3,
+        "text": "Within this tab, you can choose the type of ride to place.\nFor now, let's select the carousel by clicking on it.",
+        "highlight_pos": [1075, 690],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 4,
+        "text": "You can see the cost of the action under the action button.",
+        "highlight_pos": [1420, 942],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 5,
+        "text": "There are multiple colors available for each ride.\nLet's see how expensive a green carousel is.",
+        "highlight_pos": [1142, 918],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      
+      {
+        "step_idx": 6,
+        "text": "You can check how much money you currently have by looking at\nyour info panel.",
+        "highlight_pos": [1620, 176],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 7,
+        "text": "Since there isn't currently enough money for the green\ncarousel, let's go back to the yellow one.",
+        "highlight_pos": [1050, 918],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 8,
+        "text": "For rides, you need to input a ticket price. Click on the box\nand type a number. Note the max price underneath.",
+        "highlight_pos": [1400, 842],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 9,
+        "text": "Great! Now, click on the place button.",
+        "highlight_pos": [1430, 907],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 10,
+        "text": "You can see the button now says 'Placing...'.\nNow place by clicking on a tile in the grid.",
+        "highlight_pos": [550, 650],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 11,
+        "text": "After performing an action, the day starts and guests visit\nyour park. You can always check the day's progression.",
+        "highlight_pos": [1003, 0],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 12,
+        "text": "You can also control the speed of the day using the playback\npanel, ...",
+        "highlight_pos": [1620, 13],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 13,
+        "text": "..., or skip animating the day entirely by unchecking the\nanimate day box.",
+        "highlight_pos": [1760, 13],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 14,
+        "text": "Well done! You've completed a full day. Check the info panel\nto see how the day went. Note: profit includes action cost.",
+        "highlight_pos": [1620, 220],
+        "include_arrow": true,
+        "include_ok_button": true 
+      },
+      {
+        "step_idx": 15,
+        "text": "This is your park rating. It increases with\nguest happiness, high excitement, and balanced intensity...",
+        "highlight_pos": [1615, 345],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 16,
+        "text": "...and decreases with low cleanliness, or when rides or\nshops go out of service too frequently.",
+        "highlight_pos": [1615, 345],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 17,
+        "text": "This is the capacity of your park,\nwhich is determined by the cumulative capacity of your rides",
+        "highlight_pos": [1754, 345],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 18,
+        "text": "This is the number of guests that visited your park today",
+        "highlight_pos": [1615, 400],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 19,
+        "text": "And lastly, this is the average amount of money spent\nby each guest.",
+        "highlight_pos": [1755, 400],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 20,
+        "text": "You can find even more information about your park\nin the aggregate stats panel.",
+        "highlight_pos": [1620, 680],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 21,
+        "text": "Now let's place a shop. Select the shop tab by clicking on it.",
+        "highlight_pos": [1105, 565],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 22,
+        "text": "Shop types include drink, food, and specialty.\nPick any you want.",
+        "highlight_pos": [1075, 690],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 23,
+        "text": "Shops require an item price and an order quantity. First input\nthe item price, which is how much guests will pay for an item.",
+        "highlight_pos": [1220, 790],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 24,
+        "text": "Next, input the order quantity. This determines how many items\nto stock each day.",
+        "highlight_pos": [1400, 790],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 25,
+        "text": "Now, place the shop. Note: both rides and shops can only\nbe placed on an empty tile beside a path.",
+        "highlight_pos": [1430, 907],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 26,
+        "text": "Excellent! Now navigate to the staff tab.",
+        "highlight_pos": [1190, 565],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 27,
+        "text": "Place any staff you want.\nNote: staff can only be placed on a path or in an attraction.",
+        "highlight_pos": [1430, 907],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 28,
+        "text": "There's also a research tab. In medium difficulty, research is\nrequired to unlock higher colored entities.",
+        "highlight_pos": [1275, 565],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 29,
+        "text": "The guest survey tab allows you to survey guests.\nNote: results become visible once a survey has been completed.",
+        "highlight_pos": [1360, 565],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 30,
+        "text": "Finally, there's the wait and sandbox tab.",
+        "highlight_pos": [1530, 565],
+        "include_arrow": true,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 31,
+        "text": "In sandbox mode, you can find a range of additonal actions\nhere to help you experiment.",
+        "highlight_pos": [1050, 825],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 32,
+        "text": "In evaluation, this tab only contains wait, which allows you\nto start the day without performing any actions.",
+        "highlight_pos": [1200, 665],
+        "include_arrow": true,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 33,
+        "text": "Finally, checkout the game's documentation in the top right.\nIt includes detailed game mechanics and useful tips.",
+        "highlight_pos": [1950, 0],
+        "include_arrow": false,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 34,
+        "text": "And that's it! You now know all the basics needed\nto play.",
+        "highlight_pos": [990, 335],
+        "include_arrow": false,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 35,
+        "text": "Feel free to hang out here. When you are ready, click the\nend button in the sandbox tab to return to the main menu.",
+        "highlight_pos": [0, 0],
+        "include_arrow": false,
+        "include_ok_button": false
+      },
+      {
+        "step_idx": 36,
+        "text": "Uh oh! You played an invalid action.\nNote: The day will still run as if you made no action.",
+        "highlight_pos": [990, 335],
+        "include_arrow": false,
+        "include_ok_button": true
+      },
+      {
+        "step_idx": 37,
+        "text": "Check the error box up top to see what went wrong.\n When the day is done, try again to see if you can fix it.",
+        "highlight_pos": [100, 10],
+        "include_arrow": false,
+        "include_ok_button": false
+      }
+    ]
+  },
+  "end_screen": {
+    "final_score_text_offset": [20, 50],
+    "final_score_panel": [757, 400],
+    "final_score_offset": [50, 40],
+    "remaining_days_text_offset": [600, 650],
+    "done_button_offset": [823, 600]
+  }
+}

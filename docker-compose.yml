@@ -1,0 +1,59 @@
+services:
+  # Backend server (Express + Socket.io)
+  backend:
+    build:
+      context: .
+      dockerfile: map_backend/Dockerfile
+    container_name: map_backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MAP_PORT=3000
+      # CORS origin - can be set to production domain or comma-separated list
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:3001}
+      # AWS credentials for S3 and DynamoDB access
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+    restart: unless-stopped
+    networks:
+      - map-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('net').connect(3000, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Website frontend (SvelteKit)
+  website:
+    build:
+      context: .
+      dockerfile: website/Dockerfile
+    container_name: map-website
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - ORIGIN=http://localhost:3001
+      # Backend API URL for the website to connect to
+      - PUBLIC_BACKEND_URL=http://backend:3000
+      # Increase body size limit for trajectory file uploads (default is 512KB)
+      # Set to 10MB to accommodate large trajectory files
+      - BODY_SIZE_LIMIT=10485760
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - map-network
+
+networks:
+  map-network:
+    driver: bridge
+
+# Optional: Add volumes for persistent data or logs
+# volumes:
+#   logs:

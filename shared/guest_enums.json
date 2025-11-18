@@ -1,0 +1,126 @@
+{
+  "preferences": {
+    "0": {
+      "description": "no preferences"
+    },
+    "1": {
+      "description": "high-intensity rides"
+    },
+    "2": {
+      "description": "low-intensity rides"
+    },
+    "3": {
+      "description": "lower prices"
+    },
+    "4": {
+      "description": "higher prices"
+    },
+    "5": {
+      "description": "roller coasters"
+    },
+    "6": {
+      "description": "ferris wheels"
+    },
+    "7": {
+      "description": "carousels"
+    },
+    "8": {
+      "description": "red-colored rides"
+    },
+    "9": {
+      "description": "blue-colored rides"
+    },
+    "10": {
+      "description": "green-colored rides"
+    },
+    "11": {
+      "description": "yellow-colored rides"
+    },
+    "12": {
+      "description": "rides adjacent to water"
+    },
+    "13": {
+      "description": "rides not adjacent to water"
+    }
+  },
+  "preference_description_to_id": {
+    "no preferences": 0,
+    "high-intensity rides": 1,
+    "low-intensity rides": 2,
+    "lower prices": 3,
+    "higher prices": 4,
+    "roller coasters": 5,
+    "ferris wheels": 6,
+    "carousels": 7,
+    "red-colored rides": 8,
+    "blue-colored rides": 9,
+    "green-colored rides": 10,
+    "yellow-colored rides": 11,
+    "rides adjacent to water": 12,
+    "rides not adjacent to water": 13
+  },
+  "exit_reasons": {
+    "0": {
+      "description": "No specific reason for exit"
+    },
+    "1": {
+      "description": "Day ended"
+    },
+    "2": {
+      "description": "Too unhappy"
+    },
+    "3": {
+      "description": "Ran out of energy"
+    },
+    "4": {
+      "description": "Spent all their money"
+    },
+    "5": {
+      "description": "Too thirsty"
+    },
+    "6": {
+      "description": "Too hungry"
+    },
+    "7": {
+      "description": "Too few food shops"
+    },
+    "8": {
+      "description": "Too few drink shops"
+    },
+    "9": {
+      "description": "Too few rides"
+    },
+    "10": {
+      "description": "Too few unique drink shops"
+    },
+    "11": {
+      "description": "Too few unique food shops"
+    },
+    "12": {
+      "description": "Too few unique rides"
+    },
+    "13": {
+      "description": "Too few unique attractions"
+    },
+    "14": {
+      "description": "Walked by the exit"
+    }
+  },
+  "exit_reason_description_to_id": {
+    "No specific reason for exit": 0,
+    "Day ended": 1,
+    "Too unhappy": 2,
+    "Ran out of energy": 3,
+    "Spent all their money": 4,
+    "Too thirsty": 5,
+    "Too hungry": 6,
+    "Too few food shops": 7,
+    "Too few drink shops": 8,
+    "Too few rides": 9,
+    "Too few unique drink shops": 10,
+    "Too few unique food shops": 11,
+    "Too few unique rides": 12,
+    "Too few unique attractions": 13,
+    "Walked by the exit": 14
+  }
+}

@@ -1,0 +1,76 @@
+# Git and version control
+.git
+.gitignore
+.gitattributes
+
+# Node modules (will be installed in container)
+node_modules/
+website/node_modules/
+
+# Build artifacts
+website/build/
+website/.svelte-kit/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+website/logged_trajectories/
+logged_trajectories/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Shared directory exclusions
+shared/.DS_Store
+
+# Testing and development
+tests/
+*.test.js
+*.spec.js
+
+# Python artifacts (not needed for Node.js containers)
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+MAP.egg-info/
+theme_park.egg-info/
+map_py/
+
+# Documentation and markdown (optional - uncomment if you don't need docs in container)
+# *.md
+# documentation*.md
+
+# Game assets that aren't needed in production
+game_gifs/
+game_images/
+results.csv
+
+# Lock files (we'll use package-lock.json, but exclude others)
+yarn.lock
+pnpm-lock.yaml
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Scripts not needed in production
+scripts/
+launch_game.py
+launch_servers_tmux.sh
+
+# Claude Code
+.claude/

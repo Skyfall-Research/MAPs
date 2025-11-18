@@ -1,0 +1,118 @@
+{
+  "actions": [
+    {
+      "action_name": "place",
+      "description": "Place an entity (ride or shop or staff) in the amusement park",
+      "parameters": {
+        "x": "The x position of the entity",
+        "y": "The y position of the entity",
+        "type": "The type of entity. Must be one of ride or shop or staff",
+        "subtype": "The subtype of the entity to be placed. For rides, must be one of carousel, ferris wheel, or roller coaster. For shops, must be one of drink, food, or specialty. For staff, must be one of janitor, mechanic, or specialist",
+        "subclass": "The specific instance of the entity to be placed. Must be one of yellow, blue, green, or red",
+        "price": "The price of the ticket or item. Only for rides and shops.",
+        "order_quantity": "The maximum order_quantity of inventory. Only for shops."
+      }
+    },
+    {
+      "action_name": "move",
+      "description": "Move an entity (ride or shop or staff) in the amusement park",
+      "parameters": {
+        "type": "The type of entity. Must be one of ride or shop or staff",
+        "subtype": "The subtype of the entity to be moved. For rides, must be one of carousel, ferris wheel, or roller coaster. For shops, must be one of drink, food, or specialty. For staff, must be one of janitor, mechanic, or specialist",
+        "subclass": "The specific instance of the entity to be moved. Must be one of yellow, blue, green, or red",
+        "x": "The current x position of the entity",
+        "y": "The current y position of the entity",
+        "new_x": "The new x position",
+        "new_y": "The new y position"
+      }
+    },
+    {
+      "action_name": "remove",
+      "description": "Remove an entity (ride or shop or staff). If the entity is a ride or shop, it will be sold for a price.",
+      "parameters": {
+        "type": "The type of entity. Must be one of ride or shop or staff",
+        "subtype": "The subtype of the entity to be removed. For rides, must be one of carousel, ferris wheel, or roller coaster. For shops, must be one of drink, food, or specialty. For staff, must be one of janitor, mechanic, or specialist",
+        "subclass": "The specific instance of the entity to be removed. Must be one of yellow, blue, green, or red",
+        "x": "The x position of the entity",
+        "y": "The y position of the entity"
+      }
+    },
+    {
+      "action_name": "modify",
+      "description": "Change the price and (as applicable) order_quantity of inventory for an attraction",
+      "parameters": {
+        "type": "The type of attraction. Must be one of ride or shop",
+        "x": "The x position of the attraction",
+        "y": "The y position of the attraction",
+        "price": "The new price",
+        "order_quantity": "The new maximum order_quantity of inventory. Only for shops."
+      }
+    },
+    {
+      "action_name": "set_research",
+      "description": "Set the research speed and topic(s) for the amusement park. Only available in medium or hard difficulty.",
+      "parameters": {
+        "research_speed": "The research speed. Must be one of none, slow, medium, or fast",
+        "research_topics": "The topics(s) of research. Must be a subset of ['carousel', 'ferris_wheel', 'roller_coaster', 'drink', 'food', 'specialty']"
+      }
+    },
+    {
+      "action_name": "survey_guests",
+      "description": "Retrieve a sample of information from guests",
+      "parameters": {
+        "num_guests": "The number of guests to survey"
+      }
+    },
+    {
+      "action_name": "add_path",
+      "description": "Add a path tile to the amusement park. Only available in hard difficulty.",
+      "parameters": {
+        "x": "The x position of the path tile",
+        "y": "The y position of the path tile"
+      }
+    },
+    {
+      "action_name": "remove_path",
+      "description": "Remove a path tile from the amusement park. Only available in hard difficulty.",
+      "parameters": {
+        "x": "The x position of the path tile",
+        "y": "The y position of the path tile"
+      }
+    },
+    {
+      "action_name": "add_water",
+      "description": "Add a water tile to the amusement park. Only available in hard difficulty.",
+      "parameters": {
+        "x": "The x position of the water tile",
+        "y": "The y position of the water tile"
+      }
+    },
+    {
+      "action_name": "remove_water",
+      "description": "Remove a water tile from the amusement park. Only available in hard difficulty.",
+      "parameters": {
+        "x": "The x position of the water tile",
+        "y": "The y position of the water tile"
+      }
+    },
+    {
+      "action_name": "wait",
+      "description": "runs the day without any new action",
+      "parameters": {}
+    }
+  ],
+  "param_types": {
+    "x": "number",
+    "y": "number",
+    "new_x": "number",
+    "new_y": "number",
+    "type": "string",
+    "subtype": "string",
+    "subclass": "string",
+    "price": "number",
+    "order_quantity": "number",
+    "num_guests": "number",
+    "research_speed": "string",
+    "research_topics": "array"
+  }
+}

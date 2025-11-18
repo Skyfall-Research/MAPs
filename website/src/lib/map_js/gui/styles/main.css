@@ -1,0 +1,36 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+#game-container {
+    border: 2px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+}
+
+/* Text styling constants for Phaser text objects */
+:root {
+    --game-title-font-size: 32px;
+    --game-title-color: #ffffff;
+    --game-title-font-family: Arial, sans-serif;
+    --game-title-font-style: bold;
+    --game-title-stroke-color: #000000;
+    --game-title-stroke-thickness: 2;
+    
+    --placeholder-font-size: 24px;
+    --placeholder-color: #ffffff;
+    --placeholder-font-family: Arial, sans-serif;
+    --placeholder-stroke-color: #000000;
+    --placeholder-stroke-thickness: 2;
+}

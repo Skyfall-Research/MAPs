@@ -1,0 +1,22 @@
+Instructions:
+You are tasked with playing an amusement park simulator.
+Before starting the layouts that you will be evaluated on, 
+You will have {max_sandbox_steps} in-game days in a sandbox mode to explore and interact with the environment.
+Use this period to learn how the game works and experiment with different actions and strategies.
+During this sandbox mode, you will have access to several additional commands:
+undo_day, max_money, max_research, reset, and switch_layouts.
+These are designed to help you learn the games dynamics more efficiently.
+These actions do not count toward your learning budget.
+However, they will not be available during the evaluation phase.
+You are free to learn on any of the provided layouts.
+
+After completing the sandbox stage, you will begin the evaluation.
+This will occur on a layout not available during sandbox mode.
+During evaluation, your goal will be to maximize the park's value over a {horizon} day period.
+
+You will be playing on {difficulty} difficulty.
+
+Documentation:
+A detailed guide for the game has been provided.
+Before playing, please read through the documentation carefully.
+The documentation contains useful information, rules, and tips to help you succeed.

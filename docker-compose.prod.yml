@@ -1,0 +1,71 @@
+# Production Docker Compose Configuration for Theme Park
+# This file is used for AWS EC2 deployment
+#
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Environment Variables:
+#   - DOMAIN: The production domain (e.g., maps.skyfall.ai)
+#   - AWS_REGION: AWS region for DynamoDB and S3 (default: us-east-2)
+
+services:
+  # Backend server (Express + Socket.io)
+  backend:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/theme-park-backend:${IMAGE_TAG:-latest}
+    container_name: theme-park-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - THEME_PARK_PORT=3000
+      # Accept CORS from multiple origins (ALB DNS and domain)
+      - CORS_ORIGIN=https://${ALB_DNS:-theme-park-alb-591885444.us-east-2.elb.amazonaws.com},https://${DOMAIN:-maps.skyfall.ai}
+      - AWS_REGION=${AWS_REGION:-us-east-2}
+      # AWS credentials will be provided by EC2 instance role (no need to specify)
+    restart: unless-stopped
+    networks:
+      - theme-park-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('net').connect(3000, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Website frontend (SvelteKit)
+  website:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/theme-park-website:${IMAGE_TAG:-latest}
+    container_name: theme-park-website
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      # ORIGIN can be dynamic - accept requests from ALB DNS or domain
+      - ORIGIN=https://maps.skyfall.ai
+      # Increase body size limit for trajectory file uploads (default is 512KB)
+      # Set to 10MB to accommodate large trajectory files
+      - BODY_SIZE_LIMIT=10485760
+      # Frontend automatically detects environment using window.location.hostname
+      # - If hostname is localhost/127.0.0.1: uses localhost:3000
+      # - Otherwise: uses relative paths /v1/* (routed by ALB to backend)
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - theme-park-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  theme-park-network:
+    driver: bridge

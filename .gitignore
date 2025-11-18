@@ -1,0 +1,52 @@
+*.code-workspace
+theme_park.egg-info/
+node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+.DS_Store
+.vscode
+logs/
+gifs/
+build/
+**.log
+logs/env_logs/*.log
+logs/env_logs/all.log
+
+develop-eggs/
+eggs/
+.eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+trajectories/
+node_modules/
+
+# SvelteKit build artifacts
+website/.svelte-kit/
+website/build/
+
+# Symlinks created by setup-dev.sh (local development only)
+website/static/assets
+website/static/fonts
+website/static/layouts
+website/static/scenarios
+website/static/*.json
+website/static/*.yaml
+website/static/*.md
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/terraform.tfvars
+terraform/*.pem
+terraform/*.key
+
+# Environment files
+.env
+.env.production
+website/.env.production
+/.idea
+/localdocs

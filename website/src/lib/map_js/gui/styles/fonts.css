@@ -1,0 +1,24 @@
+@font-face {
+    font-family: 'PixelFont';
+    src: url('/assets/text_assets/pixel_font.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'SpaceMono';
+    src: url('/assets/text_assets/SpaceMono-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Fallback fonts */
+.pixel-font {
+    font-family: 'PixelFont', 'Courier New', monospace;
+}
+
+.space-mono {
+    font-family: 'SpaceMono', 'Courier New', monospace;
+}

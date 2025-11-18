@@ -1,0 +1,407 @@
+{
+    "rides": {
+        "carousel": {
+            "yellow": {
+                "building_cost": 250,
+                "cost_per_operation": 1,
+                "capacity": 6,
+                "max_ticket_price": 4,
+                "ticket_price": -1,
+                "excitement": 1,
+                "intensity": 1,
+                "breakdown_rate": 0.001
+            },
+            "blue": {
+                "building_cost": 1500,
+                "cost_per_operation": 2,
+                "capacity": 14,
+                "max_ticket_price": 6,
+                "ticket_price": -1,
+                "excitement": 4,
+                "intensity": 3,
+                "breakdown_rate": 0.002
+            },
+            "green": {
+                "building_cost": 8000,
+                "cost_per_operation": 16,
+                "capacity": 28,
+                "max_ticket_price": 14,
+                "ticket_price": -1,
+                "excitement": 3,
+                "intensity": 4,
+                "breakdown_rate": 0.003
+            },
+            "red": {
+                "building_cost": 22000,
+                "cost_per_operation": 12,
+                "capacity": 24,
+                "max_ticket_price": 24,
+                "ticket_price": -1,
+                "excitement": 8,
+                "intensity": 5,
+                "breakdown_rate": 0.005
+            }
+        },
+        "ferris_wheel": {
+            "yellow": {
+                "building_cost": 500,
+                "cost_per_operation": 10,
+                "capacity": 10,
+                "max_ticket_price": 5,
+                "ticket_price": -1,
+                "excitement": 2,
+                "intensity": 2,
+                "breakdown_rate": 0.006
+            },
+            "blue": {
+                "building_cost": 10000,
+                "cost_per_operation": 20,
+                "capacity": 20,
+                "max_ticket_price": 7,
+                "ticket_price": -1,
+                "excitement": 5,
+                "intensity": 3,
+                "breakdown_rate": 0.009
+            },
+            "green": {
+                "building_cost": 50000,
+                "cost_per_operation": 42,
+                "capacity": 40,
+                "max_ticket_price": 15,
+                "ticket_price": -1,
+                "excitement": 4,
+                "intensity": 6,
+                "breakdown_rate": 0.023
+            },
+            "red": {
+                "building_cost": 75000,
+                "cost_per_operation": 75,
+                "capacity": 30,
+                "max_ticket_price": 28,
+                "ticket_price": -1,
+                "excitement": 9,
+                "intensity": 8,
+                "breakdown_rate": 0.018
+            }
+        },
+        "roller_coaster": {
+            "yellow": {
+                "building_cost": 1000,
+                "cost_per_operation": 9,
+                "capacity": 4,
+                "max_ticket_price": 10,
+                "ticket_price": -1,
+                "excitement": 3,
+                "intensity": 4,
+                "breakdown_rate": 0.01
+            },
+            "blue": {
+                "building_cost": 18000,
+                "cost_per_operation": 25,
+                "capacity": 12,
+                "max_ticket_price": 20,
+                "ticket_price": -1,
+                "excitement": 7,
+                "intensity": 7,
+                "breakdown_rate": 0.02
+            },
+            "green": {
+                "building_cost": 60000,
+                "cost_per_operation": 45,
+                "capacity": 28,
+                "max_ticket_price": 34,
+                "ticket_price": -1,
+                "excitement": 6,
+                "intensity": 9,
+                "breakdown_rate": 0.025
+            },
+            "red": {
+                "building_cost": 100000,
+                "cost_per_operation": 100,
+                "capacity": 22,
+                "max_ticket_price": 50,
+                "ticket_price": -1,
+                "excitement": 10,
+                "intensity": 10,
+                "breakdown_rate": 0.033
+            }
+        }
+    },
+    "ride_rejection_happiness_penalty": 0.2,
+    "shops": {
+        "drink": {
+            "yellow": {
+                "building_cost": 100,
+                "thirst_reduction": 0.4,
+                "max_item_price": 3,
+                "item_price": -1,
+                "item_cost": 0,
+                "order_quantity": -1,
+                "notes": "↓ thirst."
+            },
+            "blue": {
+                "building_cost": 2250,
+                "thirst_reduction": 0.7,
+                "max_item_price": 6,
+                "item_price": -1,
+                "item_cost": 1,
+                "order_quantity": -1,
+                "notes": "↓ thirst."
+            },
+            "green": {
+                "building_cost": 17500,
+                "thirst_reduction": 0.9,
+                "happiness_boost": 0.4,
+                "max_item_price": 17,
+                "item_price": -1,
+                "item_cost": 3,
+                "order_quantity": -1,
+                "notes": "↓ thirst and ↑ happiness."
+            },
+            "red": {
+                "building_cost": 48000,
+                "max_item_price": 25,
+                "thirst_reduction": 0.7,
+                "energy_boost": 20,
+                "caffeinated_steps": 50,
+                "item_price": -1,
+                "item_cost": 5,
+                "order_quantity": -1,
+                "notes": "↓ thirst and ↑ energy and walking speed."
+            }
+        },
+        "food": {
+            "yellow": {
+                "building_cost": 200,
+                "hunger_reduction": 0.3,
+                "max_item_price": 5,
+                "item_price": -1,
+                "item_cost": 1,
+                "order_quantity": -1,
+                "notes": "↓ hunger."
+            },
+            "blue": {
+                "building_cost": 3600,
+                "hunger_reduction": 0.7,
+                "max_item_price": 9,
+                "item_price": -1,
+                "item_cost": 2,
+                "order_quantity": -1,
+                "notes": "↓ hunger."
+            },
+            "green": {
+                "building_cost": 28000,
+                "hunger_reduction": 0.8,
+                "thirst_reduction": 0.4,
+                "max_item_price": 18,
+                "item_price": -1,
+                "item_cost": 4,
+                "order_quantity": -1,
+                "notes": "↓ hunger and thirst."
+            },
+            "red": {
+                "building_cost": 60000,
+                "hunger_reduction": 0.9,
+                "happiness_boost": 0.6,
+                "max_item_price": 34,
+                "item_price": -1,
+                "item_cost": 8,
+                "order_quantity": -1,
+                "notes": "↓ hunger and ↑ happiness."
+            }
+        },
+        "specialty": {
+            "yellow": {
+                "building_cost": 250,
+                "happiness_boost": 0.5,
+                "max_item_price": 14,
+                "item_price": -1,
+                "item_cost": 4,
+                "order_quantity": -1,
+                "notes": "↑ guest happiness."
+            },
+            "blue": {
+                "building_cost": 10000,
+                "max_item_price": 5,
+                "item_price": -1,
+                "item_cost": 2,
+                "order_quantity": -1,
+                "notes": "Informs guests about attractions."
+            },
+            "green": {
+                "building_cost": 50000,
+                "money_withdrawal": 64,
+                "min_withdrawal": 16,
+                "max_item_price": 5,
+                "item_price": -1,
+                "item_cost": 3,
+                "order_quantity": -1,
+                "notes": "Allows guests to withdraw money."
+            },
+            "red": {
+                "building_cost": 10000,
+                "thirst_boost": 0.2,
+                "hunger_boost": 0.2,
+                "happiness_boost": 0.2,
+                "max_item_price": 0,
+                "item_price": -1,
+                "item_cost": 0,
+                "order_quantity": -1,
+                "money_threshold": 25,
+                "notes": "↑ thirst, hunger, and happiness."
+            }
+        }
+    },
+    "specialty_decay_rate": 2,
+    "staff": {
+        "janitor": {
+            "yellow": {
+                "salary": 20,
+                "clean_rate": 0.025,
+                "cleaning_threshold": 0.85,
+                "notes": "Cleans tiles."
+            },
+            "blue": {
+                "salary": 80,
+                "clean_rate": 0.075,
+                "cleaning_threshold": 0.95,
+                "notes": "Cleans tiles fast, walks fast."
+            },
+            "green": {
+                "salary": 500,
+                "clean_rate": 0.2,
+                "cleaning_threshold": 1.0,
+                "notes": "Cleans tiles faster, walks fast."
+            },
+            "red": {
+                "salary": 2000,
+                "clean_rate": 0.35,
+                "cleaning_threshold": 1.2,
+                "notes": "Cleans tiles fastest, walks fast.\nProvides preventative cleaning."
+            }
+        },
+        "mechanic": {
+            "yellow": {
+                "salary": 25,
+                "repair_rate": 2,
+                "notes": "Repairs rides."
+            },
+            "blue": {
+                "salary": 100,
+                "repair_rate": 8,
+                "notes": "Repairs rides fast, walks fast."
+            },
+            "green": {
+                "salary": 250,
+                "repair_rate": 20,
+                "notes": "Repairs rides faster, walks fast."
+            },
+            "red": {
+                "salary": 1000,
+                "repair_rate": 50,
+                "notes": "Repairs rides fastest, walks fast.\nProvides preventative maintenance."
+            }
+        },
+        "specialist": {
+            "yellow": {
+                "salary": 100,
+                "happiness_boost": 0.25,
+                "notes": "Entertains guest in ride lines."
+            },
+            "blue": {
+                "salary": 350,
+                "notes": "Restocks shops.",
+                "stocking_rate": 0.1,
+                "max_inventory": 100,
+                "restock_threshold": 0.25,
+                "idle_ticks": 30
+            },
+            "green": {
+                "salary": 400,
+                "notes": "Informs guests about dirty\nor out of service attractions."
+            },
+            "red": {
+                "salary": 1000,
+                "hunger_reduction": 0.3,
+                "thirst_reduction": 0.5,
+                "notes": "Provides food and drink to\nguests waiting in line."
+            }
+        }
+    },
+    "guest_initial_money": [
+        150,
+        25
+    ],
+    "guest_initial_energy": [
+        75,
+        20
+    ],
+    "hunger_build_rate": 0.010,
+    "thirst_build_rate": 0.015,
+    "happiness_decay_rate": 0.04,
+    "happiness_decay_rate_low_cleanliness": 0.03,
+    "happiness_attraction_rejection_penalty": 0.2,
+    "per_guest_survey_cost": 500,
+    "max_guests_to_survey": 25,
+    "littering_penalty": 0.004,
+    "ride_repair_cost_percentage": 0.042,
+    "sell_percentage": 0.66,
+    "research_value_per_point": 60,
+    "park_size": 20,
+    "ticks_per_day": 500,
+    "vis_update_rate": 1,
+    "path_addition_cost": 1000,
+    "path_removal_cost": 2500,
+    "water_addition_cost": 5000,
+    "water_removal_cost": 10000,
+    "path_nodes_range": [
+        3,
+        16
+    ],
+    "min_node_distance_range": [
+        2,
+        6
+    ],
+    "node_densification_range": [
+        0,
+        1
+    ],
+    "vertical_pathing_prob_range": [
+        0,
+        1
+    ],
+    "research": {
+        "speed_progress": {
+            "none": 0,
+            "slow": 25,
+            "medium": 50,
+            "fast": 100
+        },
+        "speed_cost": {
+            "none": 0,
+            "slow": 2000,
+            "medium": 8000,
+            "fast": 32000
+        },
+        "points_required": {
+            "blue": 100,
+            "green": 200,
+            "red": 400
+        }
+    },
+    "sandbox_mode_steps": 100,
+    "test_layouts": [
+        "zig_zag",
+        "the_islands",
+        "ribs"
+    ],
+    "train_layouts": [
+        "diagonal_squares",
+        "the_ladder",
+        "two_paths",
+        "the_line",
+        "the_fork"
+    ],
+    "train_seed": 663,
+    "test_seed": 286
+}

@@ -1,0 +1,113 @@
+{
+  "account_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "129875285541"
+  },
+  "alb_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:elasticloadbalancing:us-east-2:129875285541:loadbalancer/app/theme-park-alb/8b6e07e077e63563"
+  },
+  "alb_dns_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "theme-park-alb-591885444.us-east-2.elb.amazonaws.com"
+  },
+  "backend_ecr_repository_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "129875285541.dkr.ecr.us-east-2.amazonaws.com/theme-park-backend"
+  },
+  "deployment_summary": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "backend_ecr": "string",
+        "cloudwatch_logs": "string",
+        "ec2_ip": "string",
+        "github_actions_role": "string",
+        "website_ecr": "string",
+        "website_url": "string"
+      }
+    ],
+    "value": {
+      "backend_ecr": "129875285541.dkr.ecr.us-east-2.amazonaws.com/theme-park-backend",
+      "cloudwatch_logs": "https://console.aws.amazon.com/cloudwatch/home?region=us-east-2#logsV2:log-groups",
+      "ec2_ip": "3.149.83.199",
+      "github_actions_role": "arn:aws:iam::129875285541:role/theme-park-github-actions-role",
+      "website_ecr": "129875285541.dkr.ecr.us-east-2.amazonaws.com/theme-park-website",
+      "website_url": "http://maps.skyfall.ai"
+    }
+  },
+  "dynamodb_table_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "maps_leaderboard"
+  },
+  "ec2_instance_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "i-011045b1c42cbab43"
+  },
+  "ec2_private_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "10.0.1.168"
+  },
+  "ec2_public_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "3.149.83.199"
+  },
+  "github_actions_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::129875285541:role/theme-park-github-actions-role"
+  },
+  "public_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "subnet-090848c64c966a1a0",
+      "subnet-0b3511bd238d591e1"
+    ]
+  },
+  "region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "us-east-2"
+  },
+  "s3_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "skyfall-maps-leaderboard-saved-trajectories"
+  },
+  "ssh_command": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ssh -i terraform/theme-park-key.pem ec2-user@3.149.83.199"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-042864d283112998f"
+  },
+  "website_ecr_repository_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "129875285541.dkr.ecr.us-east-2.amazonaws.com/theme-park-website"
+  },
+  "website_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "http://maps.skyfall.ai"
+  }
+}
