@@ -5,7 +5,7 @@
 </p>
 
 
- 
+
 
 
 # Mini Amusement Parks
@@ -27,9 +27,9 @@
   </a>
 </p>
 
-Mini Amusement Parks (MAPs) is a challenging amusement park business simulator designed for AI research. MAPs tests a player's ability to plan across long horizons, actively learn the dynamics of the enviornment, be adaptable to stochastic outcomes, and reason about spatial relationships. The best performing frontier models score approximately **10\% of human performance** on medium difficulty. Built to bridge the gap between simulation and reality, MAP is designed to chart progress of systems toward robust business decision-making. 
+Mini Amusement Parks (MAPs) is a challenging amusement park business simulator designed for AI research. MAPs tests a player's ability to plan across long horizons, actively learn the dynamics of the enviornment, be adaptable to stochastic outcomes, and reason about spatial relationships. The best performing frontier models score approximately **10% of human performance** on medium difficulty. Built to bridge the gap between simulation and reality, MAP is designed to chart progress of systems toward robust business decision-making.
 
-MAPs also contains several features useful to research including both GUI and text-only interfaces, adjustable difficulty, a sandbox mode with corresponding evaluation protocols, and a [live leaderboard](https://maps.skyfall.ai/leaderboard) of human and AI evaluations that includes the ability to [play online](https://maps.skyfall.ai/play). 
+MAPs also contains several features useful to research including both GUI and text-only interfaces, adjustable difficulty, a sandbox mode with corresponding evaluation protocols, and a [live leaderboard](https://maps.skyfall.ai/leaderboard) of human and AI evaluations that includes the ability to [play online](https://maps.skyfall.ai/play).
 
 
 For additional details and experimental results, see [our paper](https://openreview.net/forum?id=nJF0A933EO).
@@ -46,56 +46,38 @@ For additional details and experimental results, see [our paper](https://openrev
 
 ## Getting started
 
-### Installation 
+### Installation
 This codebase has only tested on MacOS/Linux. All instructions should be run from the directory that houses this README.md
 
 #### Install backend server
 
-Install javascript, then run:  
+Install javascript, then run:
 ```bash
-    npm install 
+    npm install
 ```
 #### Install Python Interface and Frontend
 
-Choose an option depending on your environment manager  
-(Option #1.) Create conda environment:  
+Choose an option depending on your environment manager
+(Option #1.) Create conda environment:
 ```bash
     conda create --name maps python=3.12
     conda activate maps
     pip install -e .
 ```
 
-(Option #2.) Create venv environment:  
+(Option #2.) Create venv environment:
 ```bash
-    python3.12 -m venv .venv 
+    python3.12 -m venv .venv
     source .venv/bin/activate
     pip install -e .
 ```
 
-(Option #3.) Create a uv environment:  
+(Option #3.) Create a uv environment:
 ```bash
   uv venv --python 3.12
   source .venv/bin/activate
   uv pip install -e .
 ```
-
-##### Running the game in Python
-To play the game using a human interface on training layouts:
-```bash
-    python launch_game.py [--scale SCALE] [--port PORT]
-```
-Default scale is 0.75. Default port is 3000
-
-For programmatic access, the `MiniAmusementPark` class can be imported, it implements the standard [Gymnasium](https://gymnasium.farama.org/) broadly used in RL research.
-
-```python
-from map_py.mini_amusement_park import MiniAmusementPark
-
-with MiniAmusementPark(host="localhost", port='3000', render_park=False) as game:
-    game.reset()
-    curr_state, reward, term, trunc, info = game.step('wait()')
-```
-
 
 #### Install JS Interface and Frontend
 ```bash
@@ -111,6 +93,26 @@ Note: ./setup-dev.sh creates the symlinks to share static assets between `./shar
 
 
 **Important:** The `./shared/` directory is the source of truth for all static assets (images, configs, layouts, etc.). During local development, symlinks are used. During Docker builds, files are copied from `./shared/` into the container.
+
+### Running the game
+
+##### Running the game in Python
+To play the game using a human interface on training layouts:
+```bash
+    python launch_game.py [--eval-layout EVAL_LAYOUT] [--difficulty {easy,medium,hard}] [--mode {few-shot,few-shot+docs,unlimited}] [--scale SCALE] [--port PORT]
+```
+Default scale is 0.75. Default port is 3000
+
+For programmatic access, the `MiniAmusementPark` class can be imported, it implements the standard [Gymnasium](https://gymnasium.farama.org/) broadly used in RL research.
+
+```python
+from map_py.mini_amusement_park import MiniAmusementPark
+
+with MiniAmusementPark(host="localhost", port='3000', render_park=False) as game:
+    game.reset()
+    curr_state, reward, term, trunc, info = game.step('wait()')
+```
+
 
 ##### Running the game in a browser
 Ensure localhost port 3000 is not being used.
@@ -182,6 +184,28 @@ docker build -f website/Dockerfile -t map-website .
 docker run -p 3001:3001 map-website
 ```
 
+#### Local Development Setup
+
+For local development, we use symlinks to share static assets between `./shared/` and `./website/static/`:
+
+**First-time setup (required before running `npm run dev`):**
+```bash
+cd website
+./setup-dev.sh
+```
+
+This script:
+- Removes duplicate files from `website/static/`
+- Creates symlinks from `website/static/` to `../shared/`
+- Ensures any changes to `./shared/` are immediately reflected in local development
+
+After running the setup script once, you can develop normally with:
+```bash
+npm run dev
+```
+
+**Important:** The `./shared/` directory is the source of truth for all static assets (images, configs, layouts, etc.). During local development, symlinks are used. During Docker builds, files are copied from `./shared/` into the container.
+
 #### Architecture
 
 The Docker setup consists of:
@@ -204,8 +228,8 @@ You can customize the deployment by setting environment variables in `docker-com
 
 ## Observation Space
 
-To provide compatibility for a wide-range of methods, we provide three different observation formats, each containing the same underlying data: 
-1. The GUI used by humans (see launch_game above) 
+To provide compatibility for a wide-range of methods, we provide three different observation formats, each containing the same underlying data:
+1. The GUI used by humans (see launch_game above)
 2. A text-based representation using JSON compatible objects (via Pydantic) that can be ingested by modern LLMs. You can find an example of what this looks like in example_text_obs.txt
 3. A gym-compatible grid-vector based observation that can be fed to more traditional neural networks.
 
@@ -216,8 +240,8 @@ Please refere to the [documentation](documentation.md)
 
 Copyright © 2025 Skyfall AI
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
