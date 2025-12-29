@@ -200,7 +200,7 @@ STATE_SPEC_DICT = {
          "tiles_traversed": "The number of tiles traversed by this employee (Integer)",
          "operating_cost": "The non-salary costs incurred by this employee performing their job (Integer)",
          "success_metric_value": "Measure of the employee's success. E.g., Number of tiles cleaned by a janitor, number of repair steps for a mechanic, number of restocks for a stocker, guests entertained for a clown, guests informed for the crier, and guests served for the vendor  (Float)",
-         "success_metric": "A description of this employee's success metric. 'amount_cleaned' for janitors, 'repair_steps_performed' for mechanics, 'guests_entertained' for clowns, 'restocks_performed' for stockers, 'guests_informed' for criers and 'guests_served' for vendors (String)",
+         "success_metric": "A description of this employee's success metric. 'amount_cleaned' for janitors, 'repair_steps_performed' for mechanics, 'guests_entertained' for clowns, 'items_restocked' for stockers, 'guests_informed' for criers and 'guests_served' for vendors (String)",
          }
       ],
    },

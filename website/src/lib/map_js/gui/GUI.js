@@ -608,14 +608,25 @@ class GUI extends Scene {
             this.errorMsgs.push(action);
             return;
         }
-        
+
         // if no errors or noop on invalid action, run day
         this.visualizer.gameMode = GameState.RUNNING_SIMULATION;
 
         this.turnTimes.push(Date.now() - this.prevTime);
         console.log("Calling map.step with action:", action);
-        const result = await this.map.step(action);
-        const [obs, reward, done, truncated, info] = result;
+
+        let result, obs, reward, done, truncated, info;
+        try {
+            result = await this.map.step(action);
+            [obs, reward, done, truncated, info] = result;
+        } catch (error) {
+            console.error("Error in map.step:", error);
+            this.errorMsgs.push(`Action failed: ${error.message}`);
+            // Reset game state to allow user to continue
+            this.visualizer.gameMode = GameState.WAITING_FOR_INPUT;
+            this.visualizer.showResultMessage = true;
+            return;
+        }
 
         if (done || truncated) {
             this.waitingForLastFullState = true;
@@ -715,9 +726,17 @@ class GUI extends Scene {
                 // Note: seed handling would need to be implemented if needed
             }
             
-            const result = await this.map.sandboxAction(action);
-            const [obs, info] = result;
-            
+            let result, obs, info;
+            try {
+                result = await this.map.sandboxAction(action);
+                [obs, info] = result;
+            } catch (error) {
+                console.error("Error in map.sandboxAction:", error);
+                this.errorMsgs.push(`Sandbox action failed: ${error.message}`);
+                this.visualizer.showResultMessage = true;
+                continue; // Skip to next action
+            }
+
             if (info?.error) {
                 this.errorMsgs.push(info.error.message);
             }

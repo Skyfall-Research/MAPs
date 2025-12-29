@@ -32,6 +32,9 @@ class Grid {
         this.min_node_distance_range = config.min_node_distance_range;
         this.node_densification_range = config.node_densification_range;
         this.vertical_pathing_prob_range = config.vertical_pathing_prob_range;
+
+        this.all_tiles_cache = null
+        this.cleanable_tiles_cache = null
     }
 
     resetState(grid){
@@ -41,6 +44,8 @@ class Grid {
                 this.tiles[x][y].cleanliness = parseFloat(grid[x][y].cleanliness)
             }
         }
+        this.all_tiles_cache = null
+        this.cleanable_tiles_cache = null
     }
     
     // Getters
@@ -49,27 +54,37 @@ class Grid {
     }
 
     getAllTiles() {
-        return this.tiles.flat();
+        if (this.all_tiles_cache === null){
+            this.all_tiles_cache = this.tiles.flat();
+        }
+        return this.all_tiles_cache;  // NOTE! Mutation risk! Be careful!
+    }
+
+    getCleanableTiles() {
+        if (this.cleanable_tiles_cache === null){
+            this.cleanable_tiles_cache = this.getAllTiles().filter(tile => tile.type != "water" && tile.type != "empty")
+        }
+        return this.cleanable_tiles_cache;
     }
 
     getAllPathTiles() {
-        return this.tiles.flat().filter(tile => tile.type === "path");
+        return this.getAllTiles().filter(tile => tile.type === "path");
     }
 
     getAllEntrancePathAndExitTile() {
-        return this.tiles.flat().filter(tile => tile.type === "path" || tile.type === "exit" || tile.type === "entrance");
+        return this.getAllTiles().filter(tile => tile.type === "path" || tile.type === "exit" || tile.type === "entrance");
     }
 
     getAllTerrainTiles() {
-        return this.tiles.flat().filter(tile => tile.type === "path" || tile.type === "water");
+        return this.getAllTiles().filter(tile => tile.type === "path" || tile.type === "water");
     }
 
     getAllDestinationTiles() {
-        return this.tiles.flat().filter(tile => tile.is_destination);
+        return this.getAllTiles().filter(tile => tile.is_destination);
     }
 
     getAllEmptyTiles() {
-        return this.tiles.flat().filter(tile => tile.type === "empty");
+        return this.getAllTiles().filter(tile => tile.type === "empty");
     }
     
 
@@ -125,6 +140,8 @@ class Grid {
     // Manipulate grid tiles
     clearTile(x,y){
         this.tiles[x][y] = new EmptyTile(x, y)
+        this.all_tiles_cache = null
+        this.cleanable_tiles_cache = null
         return new CommandResult(true, "Tile cleared successfully")
     }
 
@@ -137,6 +154,8 @@ class Grid {
      * @returns {boolean} True if placement succeeded.
      */
     placeElement(x, y, element) {
+        this.all_tiles_cache = null
+        this.cleanable_tiles_cache = null
         if(!this.tileIsInBounds(x, y)){
             return new CommandResult(false, "Coordinates out of bounds")
         }
@@ -157,6 +176,8 @@ class Grid {
      * @returns {boolean} True if placement succeeded.
      */
     unsafePlaceElement(x, y, element) {
+        this.all_tiles_cache = null
+        this.cleanable_tiles_cache = null
         if (!this.tileIsInBounds(x, y)){
             return new CommandResult(false, "Coordinates out of bounds")
         }
@@ -165,11 +186,15 @@ class Grid {
     }
 
     addEntrance(x, y) {
+        this.all_tiles_cache = null
+        this.cleanable_tiles_cache = null
         this.entrance = new EntranceTile(x, y);
         this.unsafePlaceElement(x, y, this.entrance);
     }
 
     addExit(x, y) {
+        this.all_tiles_cache = null
+        this.cleanable_tiles_cache = null
         this.exit = new ExitTile(x, y);
         this.unsafePlaceElement(x, y, this.exit);
     }
@@ -257,6 +282,9 @@ class Grid {
     }
 
     setupRandomParkLayout(difficulty, rng) {
+        this.all_tiles_cache = null
+        this.cleanable_tiles_cache = null
+
         // Randomly sample hyperparameters
         let numNodes = rng.randomInt(config.path_nodes_range[0], config.path_nodes_range[1]);
         let minDist = rng.randomInt(this.min_node_distance_range[0], this.min_node_distance_range[1]);
@@ -375,6 +403,8 @@ class Grid {
     }
 
     setupProvidedParkLayout(layout, difficulty) {
+        this.all_tiles_cache = null
+        this.cleanable_tiles_cache = null
         let exit_added = false;
         let entrance_added = false;
         for (let x = 0; x < this.size; x++) {
@@ -554,7 +584,7 @@ class Grid {
         }
         // For each possible destination tile, compute how to get the from every possible source tile (i.e. a tile a person can occupy)
         // Start with the exit tile
-        let allTiles = [this.exit, ...this.tiles.flat().filter(tile => tile.type !== "exit")]
+        let allTiles = [this.exit, ...this.getAllTiles().filter(tile => tile.type !== "exit")]
         for (const dest_tile of allTiles) {
             // Skip tiles that are not walkable, destinations, or adjacent to a path tile
             if (!(dest_tile.is_walkable || dest_tile.is_destination || this.tileIsAdjacentToPath(dest_tile))) {

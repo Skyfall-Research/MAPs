@@ -47,7 +47,7 @@
             <Button
               class="rounded-[8px] bg-skyfall-cardforeground hover:bg-skyfall-cardforeground/60"
               variant="skyfall"
-              href="https://www.google.com"
+              href="https://skyfall.ai/blog/building-the-foundations-of-an-ai-ceo"
               ><NotebookText /><span class="text-lg">Blog</span></Button
             >
             <Button

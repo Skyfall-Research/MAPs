@@ -1,5 +1,88 @@
 import axios from 'axios'
 
+/**
+ * Enhanced error logger for production debugging
+ * @param {string} context - Where the error occurred (e.g., "putEndpoint", "processAction")
+ * @param {Error} error - The error object
+ * @param {Object} metadata - Additional context (e.g., endpoint, parkId, action)
+ */
+function logError(context, error, metadata = {}) {
+  const isProduction = window.location.hostname !== 'localhost' &&
+                       window.location.hostname !== '127.0.0.1';
+
+  const errorInfo = {
+    timestamp: new Date().toISOString(),
+    environment: isProduction ? 'production' : 'development',
+    context,
+    error: {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      // Axios-specific error details
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      code: error.code,
+      config: error.config ? {
+        url: error.config.url,
+        method: error.config.method,
+        timeout: error.config.timeout
+      } : undefined
+    },
+    metadata,
+    // Browser/client info
+    userAgent: navigator.userAgent,
+    url: window.location.href
+  };
+
+  // Always log to console
+  console.error(`[${errorInfo.timestamp}] Error in ${context}:`, errorInfo);
+
+  // In production, you could send to an error tracking service
+  if (isProduction) {
+    // TODO: Send to error tracking service (e.g., Sentry, LogRocket, etc.)
+    // Example: Sentry.captureException(error, { extra: errorInfo });
+  }
+
+  return errorInfo;
+}
+
+/**
+ * Retry a function with exponential backoff
+ * @param {Function} fn - The async function to retry
+ * @param {number} maxRetries - Maximum number of retry attempts (default: 2)
+ * @param {number} baseDelay - Base delay in ms for exponential backoff (default: 1000)
+ * @returns {Promise} The result of the function or throws the last error
+ */
+async function retryWithBackoff(fn, maxRetries = 2, baseDelay = 1000) {
+  let lastError;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+
+      // Don't retry on client errors (4xx) - these won't succeed on retry
+      if (error.response && error.response.status >= 400 && error.response.status < 500) {
+        throw error;
+      }
+
+      // Don't retry if we've exhausted all attempts
+      if (attempt === maxRetries) {
+        break;
+      }
+
+      // Calculate delay with exponential backoff: baseDelay * 2^attempt
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`Request failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms...`);
+
+      // Wait before retrying
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError;
+}
 
 /**
  * Get default backend host and port from environment variables
@@ -52,44 +135,47 @@ export function handleResponse(response) {
 }
 
 export async function getEndpoint(endpoint, params = {}, host = null, port = null) {
-  try {
-    const response = await axios.get(createUrl(endpoint, host, port), { 
-      params,
-      timeout: 10000 // 10 second timeout
-    })
-    return handleResponse(response)
-  } catch (error) {
-    console.error(`GET request failed for ${endpoint}:`, error.message);
-    if (error.status == 400) {
-      return handleResponse(error.response);
-    } else if (error.code === 'ECONNREFUSED') {
-      throw new Error(`Cannot connect to server at ${host}:${port}. Is the backend server running?`);
-    } else if (error.code === 'ETIMEDOUT') {
-      throw new Error(`Request timed out for ${endpoint}. Server may be unresponsive.`);
-    } else {
-      throw new Error(`HTTP request failed: ${error.message}`);
+  return retryWithBackoff(async () => {
+    try {
+      const response = await axios.get(createUrl(endpoint, host, port), {
+        params,
+        timeout: 10000 // 10 second timeout
+      })
+      return handleResponse(response)
+    } catch (error) {
+      logError('getEndpoint', error, { endpoint, params, host, port });
+      if (error.status == 400) {
+        return handleResponse(error.response);
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error(`Cannot connect to server at ${host}:${port}. Is the backend server running?`);
+      } else if (error.code === 'ETIMEDOUT') {
+        throw new Error(`Request timed out for ${endpoint}. Server may be unresponsive.`);
+      } else {
+        throw new Error(`HTTP request failed: ${error.message}`);
+      }
     }
-  }
+  });
 }
 export async function postEndpoint(endpoint, data = {}, host = null, port = null) {
-  try {
-    const response = await axios.post(createUrl(endpoint, host, port), data, {
-      timeout: 15000 // 15 second timeout for POST requests (they can take longer)
-    })
-    return handleResponse(response)
-  } catch (error) {
-    console.error(`POST request failed for ${endpoint}:`, error.message);
-    console.log("error:", error);
-    if (error.status == 400) {
-      return handleResponse(error.response);
-    } else if (error.code === 'ECONNREFUSED') {
-      throw new Error(`Cannot connect to server at ${host}:${port}. Is the backend server running?`);
-    } else if (error.code === 'ETIMEDOUT') {
-      throw new Error(`Request timed out for ${endpoint}. Server may be unresponsive.`);
-    } else {
-      throw new Error(`HTTP request failed: ${error.message}`);
+  return retryWithBackoff(async () => {
+    try {
+      const response = await axios.post(createUrl(endpoint, host, port), data, {
+        timeout: 15000 // 15 second timeout for POST requests (they can take longer)
+      })
+      return handleResponse(response)
+    } catch (error) {
+      logError('postEndpoint', error, { endpoint, data: { ...data, parkId: data.parkId }, host, port });
+      if (error.status == 400) {
+        return handleResponse(error.response);
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error(`Cannot connect to server at ${host}:${port}. Is the backend server running?`);
+      } else if (error.code === 'ETIMEDOUT') {
+        throw new Error(`Request timed out for ${endpoint}. Server may be unresponsive.`);
+      } else {
+        throw new Error(`HTTP request failed: ${error.message}`);
+      }
     }
-  }
+  });
 }
 
 export async function putEndpoint(endpoint, data = {}, host = null, port = null) {
@@ -101,13 +187,31 @@ export async function putEndpoint(endpoint, data = {}, host = null, port = null)
       error: true
     };
   }
-  
+
   const x = data.x;
   const y = data.y;
 
   const { x: _, y: __, ...requestData } = data;
-  const response = await axios.put(createUrl(`${endpoint}/${x}/${y}`, host, port), requestData);
-  return handleResponse(response);
+
+  return retryWithBackoff(async () => {
+    try {
+      const response = await axios.put(createUrl(`${endpoint}/${x}/${y}`, host, port), requestData, {
+        timeout: 15000 // 15 second timeout
+      });
+      return handleResponse(response);
+    } catch (error) {
+      logError('putEndpoint', error, { endpoint, x, y, data: { ...requestData, parkId: data.parkId }, host, port });
+      if (error.response && error.response.status === 400) {
+        return handleResponse(error.response);
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error(`Cannot connect to server at ${host}:${port}. Is the backend server running?`);
+      } else if (error.code === 'ETIMEDOUT') {
+        throw new Error(`Request timed out for ${endpoint}. Server may be unresponsive.`);
+      } else {
+        throw new Error(`HTTP request failed: ${error.message}`);
+      }
+    }
+  });
 }
 
 export async function deleteEndpoint(endpoint, data = {}, host = null, port = null) {
@@ -119,31 +223,66 @@ export async function deleteEndpoint(endpoint, data = {}, host = null, port = nu
       error: true
     };
   }
-  
+
   const x = data.x;
   const y = data.y;
 
   const { x: _, y: __, ...requestData } = data;
 
   const url = createUrl(`${endpoint}/${x}/${y}`, host, port);
-  
-  let response;
-  if (Object.keys(requestData).length > 0) {
-      response = await axios.delete(url, { 
-        data: requestData,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-  } else {
-    response = await axios.delete(url);
-  }
-  return handleResponse(response);
+
+  return retryWithBackoff(async () => {
+    try {
+      let response;
+      if (Object.keys(requestData).length > 0) {
+        response = await axios.delete(url, {
+          data: requestData,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 15000 // 15 second timeout
+        });
+      } else {
+        response = await axios.delete(url, {
+          timeout: 15000 // 15 second timeout
+        });
+      }
+      return handleResponse(response);
+    } catch (error) {
+      logError('deleteEndpoint', error, { endpoint, x, y, data: { ...requestData, parkId: data.parkId }, host, port });
+      if (error.response && error.response.status === 400) {
+        return handleResponse(error.response);
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error(`Cannot connect to server at ${host}:${port}. Is the backend server running?`);
+      } else if (error.code === 'ETIMEDOUT') {
+        throw new Error(`Request timed out for ${endpoint}. Server may be unresponsive.`);
+      } else {
+        throw new Error(`HTTP request failed: ${error.message}`);
+      }
+    }
+  });
 }
 
 export async function deleteParkEndpoint(parkId, host = null, port = null) {
-  const response = await axios.delete(createUrl(`park/delete_park/${parkId}`, host, port));
-  return handleResponse(response)
+  return retryWithBackoff(async () => {
+    try {
+      const response = await axios.delete(createUrl(`park/delete_park/${parkId}`, host, port), {
+        timeout: 15000 // 15 second timeout
+      });
+      return handleResponse(response);
+    } catch (error) {
+      logError('deleteParkEndpoint', error, { parkId, host, port });
+      if (error.response && error.response.status === 400) {
+        return handleResponse(error.response);
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error(`Cannot connect to server at ${host}:${port}. Is the backend server running?`);
+      } else if (error.code === 'ETIMEDOUT') {
+        throw new Error(`Request timed out for delete park. Server may be unresponsive.`);
+      } else {
+        throw new Error(`HTTP request failed: ${error.message}`);
+      }
+    }
+  });
 }
 
 export function getActionNameAndArgs(action) {

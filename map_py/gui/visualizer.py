@@ -1352,7 +1352,6 @@ class Visualizer:
             self.draw_person("staff", prev_pos, curr_pos, subtype, subclass, x_offset=x_offset, y_offset=y_offset + 27)
             staff_counts[curr_pos] = curr_count + 1
 
-
     def draw_tile_state(self, state):
         """
         Draws out of operation and tile dirtiness
@@ -1417,14 +1416,5 @@ class Visualizer:
 
     def load_config(self):
         """Load the config.yaml file"""
-        # try:
-        #     with open('./shared/config.yaml', 'r') as file:
-        #         return yaml.safe_load(file)
-        # except FileNotFoundError:
-        #     print("Warning: config.yaml not found")
-        #     return {}
-        # except yaml.YAMLError as e:
-        #     print(f"Error parsing config.yaml: {e}")
-        #     return {}
         return copy.deepcopy(MAP_CONFIG)
     

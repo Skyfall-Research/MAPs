@@ -22,7 +22,7 @@ class RNG {
      */
     constructor(seed = null) {
         if (seed !== null) {
-            console.log("Seeding RNG with seed:", seed);
+            // console.log("Seeding RNG with seed:", seed);
             this.seeded = true;
             const [a, b, c, d] = this._cyrb128(String(seed));
             this._sfc32State = { a, b, c, d };

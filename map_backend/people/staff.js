@@ -51,6 +51,10 @@ export class Janitor extends Staff {
         this.success_metric = "amount_cleaned";
         this.success_metric_value = 0;
         this.tiles_traversed = 0;
+
+        // cache values for speed
+        this.cleaning_threshold = config.staff.janitor[this.subclass].cleaning_threshold;
+        this.clean_rate = config.staff.janitor[this.subclass].clean_rate;
     }
 
     static fromEmployee(employee, grid, step){
@@ -67,8 +71,10 @@ export class Janitor extends Staff {
         if(this.curr_target == null){
             let possible_targets = []
             let target_weights = []
-            for (let tile of this.grid.getAllTiles()) {
-                if (tile.cleanliness < config.staff.janitor[this.subclass].cleaning_threshold && this.grid.routing_table[this.x]?.[this.y]?.[tile.x]?.[tile.y] !== undefined) {
+            // cache lookup
+            let local_routing = this.grid.routing_table[this.x]?.[this.y];
+            for (let tile of this.grid.getCleanableTiles()) {
+                if (tile.cleanliness < this.cleaning_threshold && local_routing?.[tile.x]?.[tile.y] !== undefined) {
                     possible_targets.push(tile)
                     target_weights.push(1 / (tile.cleanliness + 0.001))
                 }
@@ -76,13 +82,10 @@ export class Janitor extends Staff {
             this.selectNewTarget(possible_targets, park.rng, target_weights)
         }
 
-        const curr_tile = this.grid.getTile(this.x, this.y)
-
-        const cleaning_rate = config.staff.janitor[this.subclass].clean_rate
-
         if (this.curr_target === null) {
             // No expense to the park occurs in this case
             // Do nothing, everything in the park is clean
+            return;
         }
         // Clean the target tile if we've reached it
         else if (this.x === this.curr_target.x && this.y === this.curr_target.y) {
@@ -90,28 +93,31 @@ export class Janitor extends Staff {
             if (park.money < 1) {
                 return;
             }
-            this.success_metric_value += cleaning_rate;
-            park.money --;
+            this.success_metric_value += this.clean_rate;
+            park.money--;
             this.operating_cost++;
             park.expenses++;
 
-            this.curr_target.cleanliness = Math.min(1.2, this.curr_target.cleanliness + cleaning_rate);
-            if (this.curr_target.cleanliness >= config.staff.janitor[this.subclass].cleaning_threshold) {
+            this.curr_target.cleanliness = Math.min(1.2, this.curr_target.cleanliness + this.clean_rate);
+            if (this.curr_target.cleanliness >= this.cleaning_threshold) {
                 this.curr_target = null;
             }
+            return;
         } // Small chance to clean a tile on the way to our target if it is dirty
-        else if (park.rng.random() < 0.1 && curr_tile.cleanliness < config.staff.janitor[this.subclass].cleaning_threshold) {
+        const curr_tile = this.grid.getTile(this.x, this.y)
+        if (park.rng.random() < 0.1 && curr_tile.cleanliness < this.cleaning_threshold) {
             if (park.money < 1) {
                 return;
             }
             // Track tiles cleaned
-            this.success_metric_value += cleaning_rate;
-            park.money --;
+
+            this.success_metric_value += this.clean_rate;
+            park.money--;
             this.operating_cost++;
             park.expenses++;
 
 
-            curr_tile.cleanliness = Math.min(1.0, curr_tile.cleanliness + cleaning_rate);
+            curr_tile.cleanliness = Math.min(1.0, curr_tile.cleanliness + this.clean_rate);
         }
         // Otherwise move toward our target
         else {
@@ -230,7 +236,6 @@ export class Stocker extends Staff {
         this.curr_target = null;
         this.prev_target = null;
         this.tiles_traversed = 0;
-        this.restocks_performed = 0;
         this.carried_inventory = 0;
         this.success_metric = "items_restocked";
     }
@@ -242,7 +247,6 @@ export class Stocker extends Staff {
         new_stocker.curr_target = employee.curr_target;
         new_stocker.next_target = employee.next_target;
         new_stocker.prev_target = employee.prev_target;
-        new_stocker.restocks_performed = employee.restocks_performed;
         new_stocker.carried_inventory = employee.carried_inventory;
         return new_stocker
     }

@@ -37,7 +37,7 @@ class Park {
         }
         this.seed = seed;
         this.rng = new RNG(seed);
-        console.log("Seed set to: ", seed);
+        // console.log("Seed set to: ", seed);
         return new CommandResult(true, `Seed=${seed}`);
     }
 
@@ -208,12 +208,12 @@ class Park {
             this.grid.unsafePlaceElement(shop.x, shop.y, shop)
         }
 
-        this.rides.sort((a, b) => a.x !== b.x ? a.x - b.x : a.y - b.y);
-        this.shops.sort((a, b) => a.x !== b.x ? a.x - b.x : a.y - b.y);
+        this.rides.sort((a, b) => a.x !== b.x ? a.x - b.x : (a.y !== b.y ? a.y - b.y : a.id.localeCompare(b.id)));
+        this.shops.sort((a, b) => a.x !== b.x ? a.x - b.x : (a.y !== b.y ? a.y - b.y : a.id.localeCompare(b.id)));
 
-        const janitors = state.staff.filter(staff => staff.subtype === "janitor").sort((a, b) => a.x - b.x || a.y - b.y || b.amount_cleaned - a.amount_cleaned).map(employee => Janitor.fromEmployee(employee, this.grid, this.step));
-        const mechanics = state.staff.filter(staff => staff.subtype === "mechanic").sort((a, b) => a.x - b.x || a.y - b.y || b.repair_steps_performed - a.repair_steps_performed).map(employee => Mechanic.fromEmployee(employee, this.grid, this.step));
-        const specialists = state.staff.filter(staff => staff.subtype === "specialist").sort((a, b) => a.x - b.x || a.y - b.y || b.success_metric - a.success_metric).map(employee => {
+        const janitors = state.staff.filter(staff => staff.subtype === "janitor").sort((a, b) => a.x - b.x || a.y - b.y || b.amount_cleaned - a.amount_cleaned || a.id.localeCompare(b.id)).map(employee => Janitor.fromEmployee(employee, this.grid, this.step));
+        const mechanics = state.staff.filter(staff => staff.subtype === "mechanic").sort((a, b) => a.x - b.x || a.y - b.y || b.repair_steps_performed - a.repair_steps_performed || a.id.localeCompare(b.id)).map(employee => Mechanic.fromEmployee(employee, this.grid, this.step));
+        const specialists = state.staff.filter(staff => staff.subtype === "specialist").sort((a, b) => a.x - b.x || a.y - b.y || b.success_metric - a.success_metric || a.id.localeCompare(b.id)).map(employee => {
             if (employee.subclass === "yellow") {
                 return Clown.fromEmployee(employee, this.grid, this.step);
             } else if (employee.subclass === "blue") {
@@ -250,6 +250,11 @@ class Park {
             }
         }
         this.action = "setState()";
+
+        // Reset history
+        // Start logging new episode with initial state
+        const initialState = this.calculateFullState();
+        this.logger.newEpisode(initialState);
     }
 
     // ACTIONS
@@ -386,9 +391,9 @@ class Park {
                 attraction.id = `${attraction.type}-(${new_x},${new_y})`
 
                 if (attraction.type == "ride") {
-                    this.rides.sort((a, b) => a.x !== b.x ? a.x - b.x : a.y - b.y);
+                    this.rides.sort((a, b) => a.x !== b.x ? a.x - b.x : (a.y !== b.y ? a.y - b.y : a.id.localeCompare(b.id)));
                 } else {
-                    this.shops.sort((a, b) => a.x !== b.x ? a.x - b.x : a.y - b.y);
+                    this.shops.sort((a, b) => a.x !== b.x ? a.x - b.x : (a.y !== b.y ? a.y - b.y : a.id.localeCompare(b.id)));
                 }
 
                 // Let staff repick their target
@@ -437,17 +442,22 @@ class Park {
         let result = null;
         if (attraction.type == "ride") {
             result = Ride.checkPrice(attraction.subtype, attraction.subclass, price)
+            if (!result.success) {
+                const error_message = "Failed to modify ride. " + result.message;
+                this.info = error_message;
+                return new CommandResult(false, error_message);
+            }
             attraction.price = price;
 
         } else {
             result = Shop.checkPriceAndQuantity(attraction.subtype, attraction.subclass, price, order_quantity)
+            if (!result.success) {
+                const error_message = "Failed to modify shop. " + result.message;
+                this.info = error_message;
+                return new CommandResult(false, error_message);
+            }
             attraction.price = price;
             attraction.order_quantity = order_quantity
-        }
-        if (!result.success) {
-            const error_message = "Failed to modify attraction. " + result.message;
-            this.info = error_message;
-            return new CommandResult(false, error_message);
         }
         this.action_valid = true;
         return new CommandResult(true, attraction.format());
@@ -631,6 +641,11 @@ class Park {
         this.info = ""
         if (numGuests > config.max_guests_to_survey) {
             const message = "Number of guests to survey must be less than or equal to " + config.max_guests_to_survey;
+            this.info = message;
+            return new CommandResult(false, message);
+        }
+        if (numGuests < 0) {
+            const message = "Number of guests to survey must be at least 1";
             this.info = message;
             return new CommandResult(false, message);
         }
@@ -973,7 +988,7 @@ class Park {
         
         for (let employee of this.staff){
             let salary = config.staff[employee.subtype][employee.subclass].salary;
-            if (this.money < salary){
+            if (salary > this.money){
                 this.fireStaff(employee.subtype, employee.subclass, employee.x, employee.y)
             } else{
                 this.money -= salary;
@@ -1149,9 +1164,9 @@ class Park {
             this.prev_guest_happiness = this.guests.map(guest => guest.happiness).reduce((a, b) => a + b, 0) / this.guests.length;
         } 
 
-        const janitors = this.staff.filter(staff => staff.subtype === "janitor").sort((a, b) => a.x - b.x || a.y - b.y || b.amount_cleaned - a.amount_cleaned);
-        const mechanics = this.staff.filter(staff => staff.subtype === "mechanic").sort((a, b) => a.x - b.x || a.y - b.y || b.repair_steps_performed - a.repair_steps_performed);
-        const specialists = this.staff.filter(staff => staff.subtype === "specialist").sort((a, b) => a.x - b.x || a.y - b.y || b.success_metric - a.success_metric);
+        const janitors = this.staff.filter(staff => staff.subtype === "janitor").sort((a, b) => a.x - b.x || a.y - b.y || b.amount_cleaned - a.amount_cleaned || a.id.localeCompare(b.id));
+        const mechanics = this.staff.filter(staff => staff.subtype === "mechanic").sort((a, b) => a.x - b.x || a.y - b.y || b.repair_steps_performed - a.repair_steps_performed || a.id.localeCompare(b.id));
+        const specialists = this.staff.filter(staff => staff.subtype === "specialist").sort((a, b) => a.x - b.x || a.y - b.y || b.success_metric - a.success_metric || a.id.localeCompare(b.id));
 
         this.staff = [...janitors, ...mechanics, ...specialists];
 

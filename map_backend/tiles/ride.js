@@ -68,10 +68,10 @@ class Ride extends Tile {
 
     static checkParameters(subtype, subclass, ticket_price, available_entities) {
         if (!config.rides.hasOwnProperty(subtype)) {
-            return new CommandResult(false, "Invalid ride type: " + subtype + ". Valid types: " + Object.keys(config.rides).join(", "));
+            return new CommandResult(false, "Invalid ride type: " + subtype + ". Valid types: " + Object.keys(config.rides).sort().join(", "));
         }
         if (!config.rides[subtype].hasOwnProperty(subclass)) {
-            return new CommandResult(false, "Invalid ride subclass: " + subclass + ". Valid subclasses: " + Object.keys(config.rides[subtype]).join(", "));
+            return new CommandResult(false, "Invalid ride subclass: " + subclass + ". Valid subclasses: " + Object.keys(config.rides[subtype]).sort().join(", "));
         }
         if (!available_entities.includes(subclass)) {
             return new CommandResult(false, "Ride has not been researched yet: " + subclass + ". Researched subclasses: " + available_entities.join(", "));
@@ -174,11 +174,14 @@ class Ride extends Tile {
         if (this.phase === "waiting") {
             this.boardGuests(park);
             // If the ride is ready to run, run it
-            if (this.countdown_until_run <= 0 && this.boarded_guests.length > 0 && park.money >= this.cost_per_operation) {
+            if (this.countdown_until_run <= 0 && this.boarded_guests.length > 0) {
                 this.phase = "running";
             }
 
         } else if (this.phase === "running") {
+            if (park.money < this.cost_per_operation) {
+                return;
+            }
             this.runRide(park);
             this.phase = "disembarking";
         } 

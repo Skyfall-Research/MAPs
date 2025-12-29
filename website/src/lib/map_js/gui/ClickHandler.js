@@ -461,6 +461,8 @@ export class ClickHandler {
         }
 
         const entityType = this.visualizer.selectedTileType;
+        const entitySubtype = this.visualizer.selectedTile.subtype;
+        const entitySubclass = this.visualizer.selectedTile.subclass;
         const entityX = this.visualizer.selectedTile.x;
         const entityY = this.visualizer.selectedTile.y;
 
@@ -470,7 +472,7 @@ export class ClickHandler {
             extraArgs += `, order_quantity=${this.visualizer.textInputs.modify_order_quantity.modify.value}`;
         }
         
-        const action = `modify(type="${entityType}", x=${entityX}, y=${entityY}, price=${newPrice}${extraArgs})`;
+        const action = `modify(type="${entityType}", subtype="${entitySubtype}", subclass="${entitySubclass}", x=${entityX}, y=${entityY}, price=${newPrice}${extraArgs})`;
         return action;
     }
 

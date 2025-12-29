@@ -71,7 +71,7 @@ class ClickHandler:
         extra_args = ""
         if entity_type == "shop":
             extra_args += f', order_quantity={self.visualizer.text_inputs["modify_order_quantity"]["modify"]["value"]}'
-        action = f'modify(type="{entity_type}", x={entity_x}, y={entity_y}, price={new_price}{extra_args})'
+        action = f'modify(type="{entity_type}", subtype="{self.visualizer.selected_tile["subtype"]}", subclass="{self.visualizer.selected_tile["subclass"]}", x={entity_x}, y={entity_y}, price={new_price}{extra_args})'
         return action
 
     def format_research_action(self):

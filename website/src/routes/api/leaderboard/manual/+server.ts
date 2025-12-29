@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
             trajectory: trajectoryContent,
             trajectoryFilename: trajectoryFile.name,
             saveLocal: false,
-            saveToCloud: false // Set to true only if you set up necessary AWS credentials and dynamoDB table / s3 Bucket
+            saveToCloud: true
         };
 
         // Determine backend URL

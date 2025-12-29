@@ -58,10 +58,10 @@ class Shop extends Tile {
 
     static checkParameters(subtype, subclass, price, order_quantity, available_shops) {
         if(!config.shops.hasOwnProperty(subtype)) {
-            return new CommandResult(false, "Invalid shop type: " + subtype + ". Valid types: " + Object.keys(config.shops).join(", "));
+            return new CommandResult(false, "Invalid shop type: " + subtype + ". Valid types: " + Object.keys(config.shops).sort().join(", "));
         }
         if(!config.shops[subtype].hasOwnProperty(subclass)) {
-            return new CommandResult(false, "Invalid shop subclass: " + subclass + ". Valid subclasses: " + Object.keys(config.shops[subtype]).join(", "));
+            return new CommandResult(false, "Invalid shop subclass: " + subclass + ". Valid subclasses: " + Object.keys(config.shops[subtype]).sort().join(", "));
         }
         if (!available_shops.includes(subclass)) {
             return new CommandResult(false, "Shop has not been researched yet: " + subclass + ". Researched subclasses: " + available_shops.join(", "));

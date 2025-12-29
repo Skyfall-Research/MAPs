@@ -143,7 +143,8 @@ export const leaderBoardRouter = ({parks}) => {
             layout: reqLayout,
             score: reqScore,
             saveLocal,
-            saveToCloud
+            saveToCloud,
+            savePath
         } = req.body;
 
         // Check if this is a form submission (trajectory provided) or game submission
@@ -253,21 +254,21 @@ export const leaderBoardRouter = ({parks}) => {
             // Save locally if requested (only for game submissions)
             if (saveLocal === true && !isFormSubmission) {
                 const park = parks[parkId];
-                const localPath = park.logger.saveLocal();
+                const localPath = park.logger.saveLocal(savePath);
                 results.localPath = localPath;
 
-                // Also save to leaderboard.tsv
-                const leaderboardPath = park.logger.saveLeaderboardEntry({
-                    parkId: parkId,
-                    is_human: is_human,
-                    name: name,
-                    resource_setting: resource_setting,
-                    score: score,
-                    layout: layout,
-                    difficulty: difficulty,
-                    timeTaken: timeTaken
-                });
-                results.leaderboardPath = leaderboardPath;
+                // // Also save to leaderboard.tsv
+                // const leaderboardPath = park.logger.saveLeaderboardEntry({
+                //     parkId: parkId,
+                //     is_human: is_human,
+                //     name: name,
+                //     resource_setting: resource_setting,
+                //     score: score,
+                //     layout: layout,
+                //     difficulty: difficulty,
+                //     timeTaken: timeTaken
+                // });
+                // results.leaderboardPath = leaderboardPath;
             }
 
             // Save to cloud if requested

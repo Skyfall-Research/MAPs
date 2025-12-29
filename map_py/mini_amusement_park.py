@@ -4,15 +4,19 @@
 from map_py.helpers import post_endpoint, get_endpoint, put_endpoint, delete_endpoint, delete_park_endpoint, get_action_name_and_args, ParkResponse
 from map_py.observations_and_actions.shared_constants import ACTION_PARAMS, ACTION_PARAM_TYPES, SANDBOX_ACTION_NAMES, SANDBOX_ACTION_PARAMS, SANDBOX_ACTION_PARAM_TYPES
 from map_py.observations_and_actions.pydantic_obs import format_pydantic_observation, FullParkObs, ParkDataGranularity, ParkObservabilityMode
-from map_py.observations_and_actions.gym_obs import format_gym_observation, ParkObservationSpace, obs_pydantic_to_array, obs_array_to_pydantic
-from map_py.observations_and_actions.gym_action import ParkActionSpace
+from map_py.observations_and_actions.gym_obs import format_gym_observation, MapsGymObservationSpace, obs_pydantic_to_array, obs_array_to_pydantic
+from map_py.observations_and_actions.gym_action import MapsGymActionSpace
+from map_py.observations_and_actions.simple_gym_obs import MapsSimpleGymObservationSpace, format_simple_gym_observation
+from map_py.observations_and_actions.simple_gym_action import MapsSimpleGymActionSpace
 from map_py.shared_constants import LAYOUTS_DIR
 from map_py.gui.visualizer import Visualizer, format_full_state, GameState
 import requests
 from typing import List, Optional, Union, Tuple, Any
 import gymnasium as gym
 import numpy as np
+import random
 from pathlib import Path
+import pygame
 import os
 import csv
 import json
@@ -22,7 +26,7 @@ class MiniAmusementPark(gym.Env):
                  host: str,
                  port: str,
                  park_id: Optional[int] = None,
-                 observation_type: str = "pydantic", # one of "pydantic", "gym", "raw"
+                 observation_type: str = "test", # one of "pydantic", "gym", "raw", "pydantic_and_image"
                  exp_name: str = "default_exp",
                  render_park: bool = False,
                  visualizer: Optional[Visualizer] = None,
@@ -30,19 +34,22 @@ class MiniAmusementPark(gym.Env):
                  observability_mode: ParkObservabilityMode = ParkObservabilityMode.NORMAL,
                  return_raw_in_info: bool = False,
                  return_detailed_guest_info: bool = False,
+                 negative_reward_on_invalid_action: bool = False,
                  difficulty: Optional[str] = None,
                  layout: Optional[str] = None,
                  starting_money: Optional[int] = None,
                  horizon: Optional[int] = None,
                  noop_on_invalid_action: bool = True,
-                 seed: Optional[int] = None):
+                 seed: Optional[int] = None,
+                 new_seed_on_reset: bool = False,
+                 verbose: bool = True):
         """Initialize a MiniAmusementPark environment instance.
 
         Args:
             host: The host address for the park's API server.
             port: The port number for the park's API server.
             park_id: Optional park ID to use. If None, a new park ID will be requested from the server.
-            observation_type: Type of observation to return. Must be one of "pydantic", "gym", "raw", or "test".
+            observation_type: Type of observation to return. Must be one of "pydantic", "gym", "raw", "pydantic_and_image", or "test".
                 Defaults to "pydantic".
             exp_name: Experiment name used for organizing rendered images. Defaults to "default_exp".
             render_park: Whether to render the park state. If True, a Visualizer will be created if not provided.
@@ -51,19 +58,19 @@ class MiniAmusementPark(gym.Env):
             observability_mode: Observability mode for the park (NORMAL or ORACLE). Defaults to NORMAL.
             return_raw_in_info: Whether to include raw state in the info dictionary returned by step/reset.
             return_detailed_guest_info: Whether to include detailed guest information in observations.
+            negative_reward_on_invalid_action: Whether to give a negative reward for invalid actions.
             difficulty: Optional difficulty setting for the park (e.g., "easy", "medium").
             layout: Optional layout name to use for the park. Must correspond to a YAML file in the layouts directory.
             starting_money: Optional starting money amount for the park.
             horizon: Optional maximum number of steps/episodes for the park.
             noop_on_invalid_action: If True, the park will proceed even if an invalid action is taken (no-op behavior).
             seed: Optional random seed for reproducibility.
-
+            new_seed_on_reset: If True, a new seed will be generated for the park on reset.
         Raises:
             ValueError: If the park settings cannot be initialized (e.g., invalid layout file).
         """
         self.host = host
         self.port = port
-        self.prev_money = None
         self.settings = {}
         self.game_size = 20
         self.session = requests.Session()
@@ -74,15 +81,24 @@ class MiniAmusementPark(gym.Env):
             self.visualizer = self.visualizer or Visualizer()
             self.image_dir = Path(__file__).parent.parent / "game_images" / self.exp_name
             os.makedirs(self.image_dir, exist_ok=True)
+        if observation_type == "pydantic_and_image":
+            self.visualizer = Visualizer(scale_factor=1.0)
 
         self.park_id = get_endpoint(host, port, "park/get_new_park_id", {}, self.session).data['parkId'] if park_id is None else park_id
         self.seed = seed
         self.set_seed(seed)
+        self.new_seed_on_reset = new_seed_on_reset
 
         self.observation_type = observation_type
 
-        self.action_space = ParkActionSpace()
-        self.observation_space = ParkObservationSpace()
+        # Initialize action and observation spaces based on observation type
+        if observation_type == "gym_simple":
+            self.action_space = MapsSimpleGymActionSpace()
+            self.observation_space = MapsSimpleGymObservationSpace()
+        else:
+            # For "gym", "pydantic", "raw", "test" modes
+            self.action_space = MapsGymActionSpace()
+            self.observation_space = MapsGymObservationSpace()
 
         self.data_level = data_level
         self.observability_mode = observability_mode
@@ -92,6 +108,7 @@ class MiniAmusementPark(gym.Env):
 
         self.return_detailed_guest_info = return_detailed_guest_info
         self.noop_on_invalid_action = noop_on_invalid_action
+        self.negative_reward_on_invalid_action = negative_reward_on_invalid_action
         # If true, make all pydantic observations None. You need return_raw_in_info to make this useful.
         if self.observation_type == "raw":
             self.return_raw_in_info = False
@@ -101,6 +118,8 @@ class MiniAmusementPark(gym.Env):
         self.starting_money = None
         self.horizon = None
         self.guest_preferences = None
+
+        self.verbose = verbose
 
         # Set initial settings.
         response = self.update_settings(layout, difficulty, starting_money, horizon)
@@ -140,7 +159,6 @@ class MiniAmusementPark(gym.Env):
         Args:
             park_id: The park ID to use.
         """
-        # TODO close / clear previous park id
         self.park_id = park_id
 
     def update_settings(self, layout: Optional[str] = None, difficulty: Optional[str] = None, 
@@ -207,20 +225,10 @@ class MiniAmusementPark(gym.Env):
             }
             raise RuntimeError(f"Error setting park: {result.message}")
 
-        self.prev_money = raw_state['state']['money']
+        obs, raw_state = self.get_observation_and_raw_state()
 
-        if self.observation_type != "raw":
-            if self.observation_type == "pydantic":
-                obs = format_pydantic_observation(raw_state, self.observability_mode, self.data_level, as_dict=False)
-            elif self.observation_type == "gym":
-                obs = format_gym_observation(raw_state)
-            else:
-                raise ValueError(f"Invalid observation type: {self.observation_type}")
-        
-            if self.return_raw_in_info:
-                info['raw_state'] = raw_state
-        else:
-            obs = raw_state
+        if self.return_raw_in_info:
+            info['raw_state'] = raw_state
 
         return obs, info
 
@@ -261,7 +269,7 @@ class MiniAmusementPark(gym.Env):
             pyd_obs = format_pydantic_observation(result.data, self.observability_mode, self.data_level, as_dict=False)
             gym_obs = format_gym_observation(result.data)
             gym_obs2 = obs_pydantic_to_array(pyd_obs)
-            pyd_obs2 = obs_array_to_pydantic(gym_obs, self.data_level, self.observability_mode, as_dict=False)
+            pyd_obs2 = obs_array_to_pydantic(gym_obs, self.data_level, self.observability_mode, as_dict=False, raw_state=result.data)
             
             # Simple comparison of pydantic model attributes
             if pyd_obs != pyd_obs2:
@@ -294,10 +302,26 @@ class MiniAmusementPark(gym.Env):
             obs = format_pydantic_observation(result.data, self.observability_mode, self.data_level, as_dict=False)
         elif self.observation_type == "gym":
             obs = format_gym_observation(result.data)
+        elif self.observation_type == "gym_simple":
+            obs = format_simple_gym_observation(result.data)
         elif self.observation_type == "raw":
             obs = result.data
-        else:
-            raise ValueError(f"Invalid observation type: {self.observation_type}")
+        elif self.observation_type == "pydantic_and_image":
+            pydantic_obs = format_pydantic_observation(result.data, self.observability_mode, self.data_level, as_dict=False)
+            formatted_state = format_full_state(pydantic_obs.model_dump())
+            self.visualizer.render_background()
+            self.visualizer.draw_game_grid(formatted_state)
+            self.visualizer.draw_people(formatted_state)
+            self.visualizer.draw_tile_state(formatted_state)
+            self.visualizer.render_grid()
+
+            # shape: (W, H, 3), dtype uint8
+            rgb_array = pygame.surfarray.array3d(self.visualizer.screen)[:1000]
+            # transpose to (H, W, 3) to match Gymnasium
+            rgb_array = np.transpose(rgb_array, (1, 0, 2))
+            # pygame.display.flip()
+            # ensure dtype is uint8 (it usually already is)
+            obs = {'image': rgb_array.astype(np.uint8), 'pydantic_obs': pydantic_obs}
 
         return obs, result.data
 
@@ -366,23 +390,24 @@ class MiniAmusementPark(gym.Env):
 
         if seed is not None:
             self.set_seed(seed)
+        elif self.new_seed_on_reset:
+            new_seed = random.randint(0, 10000)
+            self.set_seed(new_seed)
 
         obs, raw_state = self.get_observation_and_raw_state()
 
         if self.layout is None:
             self.reset_state = raw_state
-
-        self.prev_money = raw_state['state']['money']
         
         if self.return_raw_in_info:
             info['raw_state'] = raw_state
 
         if self.render_park:
-            self.render_frame(raw_state, obs, action=None, info=info)
+            self.render(raw_state, obs, action=None, info=info, save_image=False)
 
         return obs, info
         
-    def step(self, action: Union[str, ParkActionSpace]) -> Tuple[Union[FullParkObs, dict], float, bool, bool, dict]:
+    def step(self, action: Union[str, np.ndarray]) -> Tuple[Union[FullParkObs, dict], float, bool, bool, dict]:
         """Perform a step action in the environment.
 
         Args:
@@ -397,10 +422,15 @@ class MiniAmusementPark(gym.Env):
                 - info: Info dictionary. If an error occurred, 'error' will be a key in info.
                   See https://gymnasium.farama.org/api/env/#gymnasium.Env.step
         """
+        if not isinstance(action, str):
+            if self.observation_type == "gym_simple":
+                # Simple mode needs state for intelligent placement
+                raw_state = self.get_raw_state()
+                action = MapsSimpleGymActionSpace.decode_action(action, raw_state)
+            else:
+                # Full mode has all parameters in action
+                action = MapsGymActionSpace.decode_action(action)
 
-        if isinstance(action, ParkActionSpace):
-            action = self.action_space.decode_action(action)
-        
         info = {}
         # Apply action
         action_result = None  # Must be defined to check if it's a tuple later on
@@ -408,7 +438,6 @@ class MiniAmusementPark(gym.Env):
             action_result = self._act(action)
         
         reward = 0
-
 
         # Check if action was invalid
         if action_result.error:
@@ -433,7 +462,7 @@ class MiniAmusementPark(gym.Env):
                 }
             else:
                 # Action OK & no park server error, advance number of steps
-                reward = proceed_result.data['reward']
+                reward = proceed_result.data['reward'] if not self.negative_reward_on_invalid_action or 'error' not in info else -1
                 terminated = proceed_result.data['terminated']
                 truncated = proceed_result.data['truncated']
 
@@ -444,7 +473,7 @@ class MiniAmusementPark(gym.Env):
             info['raw_state'] = raw_state
 
         if self.render_park:
-            self.render_frame(raw_state, obs, action=action, info=info)
+            self.render(raw_state, obs, action=action, info=info, save_image=False)
 
         return obs, reward, terminated, truncated, info
 
@@ -461,7 +490,7 @@ class MiniAmusementPark(gym.Env):
                 print("ERROR: ", result.message)
 
     @staticmethod
-    def parse_action(action: str, park_id: int) -> ParkResponse:
+    def parse_action(action: Union[str, np.ndarray], park_id: int) -> ParkResponse:
         """Parse and validate an action string.
 
         Args:
@@ -471,7 +500,7 @@ class MiniAmusementPark(gym.Env):
         Returns:
             ParkResponse with status_code 200 and data=(action_name, action_args) if valid,
             or status_code 400 with error message if invalid.
-        """
+        """ 
         # Parse action
         try:
             action_name, action_args = get_action_name_and_args(action)
@@ -532,7 +561,8 @@ class MiniAmusementPark(gym.Env):
         """
         action_result = self.parse_action(action, self.park_id)
         if action_result.error:
-            print(f"Error parsing action: {action_result.message}")
+            if self.verbose:
+                print(f"Error parsing action: {action_result.message}")
             return action_result
         action_name, action_args = action_result.data
         action_name_keywords = action_name.split("_")
@@ -703,8 +733,8 @@ class MiniAmusementPark(gym.Env):
             return obs, info
         
 
-    def render_frame(self, raw_state: dict, obs: Optional[FullParkObs] = None, action: Optional[str] = None, 
-               info: Optional[dict] = None, filepath: Optional[str] = None) -> Union[Path, str]:
+    def render(self, raw_state: dict, obs: Optional[FullParkObs] = None, action: Optional[str] = None, 
+               info: Optional[dict] = None, filepath: Optional[str] = None, save_image: bool = True) -> Union[np.ndarray, None]:
         """Render the environment state to an image file.
 
         Args:
@@ -715,7 +745,7 @@ class MiniAmusementPark(gym.Env):
             filepath: Optional path to save the rendered image. If None, saves to image_dir/step_{step}.png.
 
         Returns:
-            The path to the saved image file.
+            The rendered image as a numpy array, or None if render_mode is "human".
 
         Note:
             Requires render_park=True or a visualizer to be set during initialization.
@@ -769,7 +799,6 @@ class MiniAmusementPark(gym.Env):
                     self.visualizer.selected_tile_type = None
                     self.visualizer.top_panel_selection_type = None
 
-
             if new_selected_tile != self.visualizer.selected_tile:
                 self.visualizer.new_tile_selected = True
                 self.visualizer.selected_tile = new_selected_tile
@@ -784,7 +813,6 @@ class MiniAmusementPark(gym.Env):
                     self.visualizer.bottom_panel_action_type = bottom_panel_type
                     break
 
-
         self.visualizer.render_background()
         self.visualizer.draw_playback_panel(16)
         self.visualizer.draw_game_ticks(0)
@@ -797,7 +825,6 @@ class MiniAmusementPark(gym.Env):
         self.visualizer.draw_aggregate_info(formatted_state)
         self.visualizer.render_grid()
 
-
         y_offset = 0
         if info and "error" in info:
             self.visualizer.draw_error_message(info['error']['message'], y_offset)
@@ -807,12 +834,24 @@ class MiniAmusementPark(gym.Env):
             self.visualizer.show_new_notification = True
             self.visualizer.draw_new_notification(f"Action: {action.replace(' ', '')}" if action else None, y_offset)
 
-        filepath = filepath or self.image_dir / f"step_{formatted_state['step']}.png"
-        self.visualizer.save_image(filepath)
-        return filepath
+        if save_image:
+            filepath = filepath or self.image_dir / f"step_{formatted_state['step']}.png"
+            self.visualizer.save_image(filepath)
+        
+        if self.render_mode == "human":
+            pygame.display.flip()
+            return None
+        elif self.render_mode == "rgb_array":
+            # shape: (W, H, 3), dtype uint8
+            rgb_array = pygame.surfarray.array3d(self.visualizer.screen)
+            # transpose to (H, W, 3) to match Gymnasium
+            rgb_array = np.transpose(rgb_array, (1, 0, 2))
+            # ensure dtype is uint8 (it usually already is)
+            return rgb_array.astype(np.uint8)
 
     def save_trajectory(self, username: str = "anon", 
-                       save_local: bool = False, save_to_cloud: bool = False) -> Union[dict, ParkResponse]:
+                       save_local: bool = False, save_to_cloud: bool = False,
+                       save_path: Optional[str] = None) -> Union[dict, ParkResponse]:
         """Save the current trajectory to the leaderboard.
 
         Args:
@@ -829,12 +868,17 @@ class MiniAmusementPark(gym.Env):
             "saveToCloud": save_to_cloud,
             "name": username or "anon",
         }
+        if save_path is not None:
+            data["savePath"] = save_path
         result = post_endpoint(self.host, self.port, "leaderboard/", data, self.session)
         if result.error:
             print("ERROR: ", result.message)
             return result
         else:
-            print("Successfully saved trajectory to leaderboard: ", result.message)
+            if save_to_cloud:
+                print("Successfully saved trajectory to leaderboard: ", result.message)
+            elif save_local:
+                print("Successfully saved trajectory to local file: ", result.message)
         return result.data
 
     def delete_park(self) -> dict:
@@ -948,7 +992,7 @@ class MiniAmusementPark(gym.Env):
 
                 if visualize:
                     raw_state = entry['end_state']
-                    self.render_frame(raw_state, obs, action=action, info=info)
+                    self.render(raw_state, obs, action=action, info=info, save_image=True)
 
                 action_validity.append(bool(entry['action_valid']))
                 revenues.append(obs.revenue if obs.revenue is not None else 0)
@@ -966,8 +1010,8 @@ class MiniAmusementPark(gym.Env):
                 raise ValueError(f"Expected first action to be 'reset()', got {trajectory[0]['action']}")
 
             # Set to initial state
-            score = 0;
-            if True:
+            score = 500;
+            if False:
                 initial_state = trajectory[0]['end_state']
                 obs, info = self.set(initial_state)
             else:

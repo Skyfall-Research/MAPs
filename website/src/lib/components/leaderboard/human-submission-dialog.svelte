@@ -44,7 +44,7 @@
                 validated: false,
                 // trajectory is undefined - backend will extract from logger
                 saveLocal: false,
-                saveToCloud: false // Set to true only if you set up necessary AWS credentials and dynamoDB table / s3 Bucket
+                saveToCloud: true
             };
 
             console.log("Submitting to leaderboard with payload:", payload);

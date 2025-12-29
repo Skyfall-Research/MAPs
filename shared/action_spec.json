@@ -42,6 +42,8 @@
       "description": "Change the price and (as applicable) order_quantity of inventory for an attraction",
       "parameters": {
         "type": "The type of attraction. Must be one of ride or shop",
+        "subtype": "The subtype of the attraction. Must be one of carousel, ferris wheel, or roller coaster. For shops, must be one of drink, food, or specialty",
+        "subclass": "The specific instance of the attraction to be modified. Must be one of yellow, blue, green, or red",
         "x": "The x position of the attraction",
         "y": "The y position of the attraction",
         "price": "The new price",

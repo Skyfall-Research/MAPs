@@ -189,11 +189,12 @@ class TrajectoryLogger {
      * Save trajectory to local file system
      * @returns {string} Path to saved file
      */
-    saveLocal() {
+    saveLocal(savePath = undefined) {
         this.ensureLogsDirectory();
 
         const filename = `${this.expName}_${this.episodeIndex}.tsv`;
-        const filepath = path.join(this.logsDir, filename);
+        const directory = savePath ? path.dirname(savePath) : this.logsDir;
+        const filepath = path.join(directory, filename);
 
         const tsvContent = this.getTrajectoryTSV();
         fs.writeFileSync(filepath, tsvContent, 'utf8');

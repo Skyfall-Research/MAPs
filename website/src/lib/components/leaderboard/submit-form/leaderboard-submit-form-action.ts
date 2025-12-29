@@ -73,7 +73,7 @@ export const leaderboardSubmit = async({request}: {request: Request}) => {
         trajectory: trajectoryContent,
         trajectoryFilename: trajectoryFilename,
         saveLocal: false,
-        saveToCloud: false // Set to true only if you set up necessary AWS credentials and dynamoDB table / s3 Bucket
+        saveToCloud: true
     };
 
     console.log("Submitting to backend:", `${backendUrl}/v1/leaderboard`);

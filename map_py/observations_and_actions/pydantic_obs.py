@@ -1,3 +1,7 @@
+"""
+Pydantic models for the MAPs environment. Provides full expressiveness in natural language.
+"""
+
 from enum import IntEnum
 from pydantic import BaseModel, Field, RootModel, field_validator, ConfigDict
 from typing import Any, Optional, Self, List, Dict, Tuple, Union
@@ -10,7 +14,6 @@ import importlib.resources
 MODULE_PATH = importlib.resources.files(__package__)
 GUEST_ENUMS = yaml.safe_load(open(MODULE_PATH/'../../shared/guest_enums.yaml'))
 
-from map_py.eval.utils import GameState
 
 class ParkDataGranularity(IntEnum):
     """Enumeration for the granularity level of park observation data.
@@ -360,7 +363,7 @@ class Water(ModelWithLevels):
     x: Optional[int] = FieldWithMode(data_level=ParkDataGranularity.HIGH, observability_mode=ParkObservabilityMode.NORMAL)
     y: Optional[int] = FieldWithMode(data_level=ParkDataGranularity.HIGH, observability_mode=ParkObservabilityMode.NORMAL)
 
-class FullParkObs(ModelWithLevels, GameState):
+class FullParkObs(ModelWithLevels):
     """Complete park observation containing all available information about the park state.
     
     This is the main observation model returned by the environment. It contains
@@ -376,7 +379,6 @@ class FullParkObs(ModelWithLevels, GameState):
     when the observation is created. Use park_observability_context() to control
     what information is included.
     """
-    parkId: Optional[str] = FieldWithMode(data_level=ParkDataGranularity.LOW, observability_mode=ParkObservabilityMode.NORMAL)
     step: Optional[int] = FieldWithMode(data_level=ParkDataGranularity.LOW, observability_mode=ParkObservabilityMode.NORMAL)
     horizon: Optional[int] = FieldWithMode(data_level=ParkDataGranularity.LOW, observability_mode=ParkObservabilityMode.NORMAL)
     value: Optional[int] = FieldWithMode(data_level=ParkDataGranularity.LOW, observability_mode=ParkObservabilityMode.NORMAL)
@@ -483,7 +485,6 @@ def format_pydantic_observation(state: dict, observability_mode: ParkObservabili
     # Use the context manager to set the settings before creating the Pydantic object
     with park_observability_context(data_level, observability_mode): 
         state_obs_model = FullParkObs(
-            parkId=state['state']['parkId'],
             step=state['state']['step'],
             horizon=state['state']['horizon'],
             value=state['state']['value'],
@@ -543,12 +544,12 @@ def format_people(state: dict) -> Tuple[dict, dict]:
     if 'guestStats' in state:
         guest_data = {
             'total_guests': state['guestStats']['total_guests'],
-            'avg_money_spent': state['guestStats']['avg_money_spent'],
-            'avg_time_in_park': state['guestStats']['avg_steps_taken'],
-            'avg_rides_visited': state['guestStats']['avg_rides_visited'],
-            'avg_food_shops_visited': state['guestStats']['avg_food_shops_visited'],
-            'avg_drink_shops_visited': state['guestStats']['avg_drink_shops_visited'],
-            'avg_specialty_shops_visited': state['guestStats']['avg_specialty_shops_visited']
+            'avg_money_spent': round(float(state['guestStats']['avg_money_spent']), 2),
+            'avg_time_in_park': round(float(state['guestStats']['avg_steps_taken']), 2),
+            'avg_rides_visited': round(float(state['guestStats']['avg_rides_visited']), 2),
+            'avg_food_shops_visited': round(float(state['guestStats']['avg_food_shops_visited']), 2),
+            'avg_drink_shops_visited': round(float(state['guestStats']['avg_drink_shops_visited']), 2),
+            'avg_specialty_shops_visited': round(float(state['guestStats']['avg_specialty_shops_visited']), 2)
         }
     else:
         # Fallback to computing from individual guests (for backward compatibility)
@@ -601,7 +602,7 @@ def format_attractions(state: dict) -> Tuple[dict, dict, List[float]]:
         'min_uptime': [],
         'total_operating_cost': 0,
         'total_revenue_generated': 0,
-        'total_excitement': state['state']['park_excitement'],
+        'total_excitement': round(float(state['state']['park_excitement']), 2),
         'avg_intensity': 0.0,
         'total_capacity': 0,
         'ride_list': []
