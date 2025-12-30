@@ -391,8 +391,9 @@ class MiniAmusementPark(gym.Env):
         if seed is not None:
             self.set_seed(seed)
         elif self.new_seed_on_reset:
-            new_seed = random.randint(0, 10000)
-            self.set_seed(new_seed)
+            self.seed = self.seed + 1 if self.seed is not None else random.randint(0, 10000)
+            self.seed = self.seed % 10000
+            self.set_seed(self.seed)
 
         obs, raw_state = self.get_observation_and_raw_state()
 
