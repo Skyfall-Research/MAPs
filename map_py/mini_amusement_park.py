@@ -308,7 +308,9 @@ class MiniAmusementPark(gym.Env):
             obs = result.data
         elif self.observation_type == "pydantic_and_image":
             pydantic_obs = format_pydantic_observation(result.data, self.observability_mode, self.data_level, as_dict=False)
-            formatted_state = format_full_state(pydantic_obs.model_dump())
+            pydantic_obs_dict = pydantic_obs.model_dump()
+            pydantic_obs_dict["staff"]["staff_list"] = result.data["staff"]
+            formatted_state = format_full_state(pydantic_obs_dict)
             self.visualizer.render_background()
             self.visualizer.draw_game_grid(formatted_state)
             self.visualizer.draw_people(formatted_state)
