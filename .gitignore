@@ -50,3 +50,6 @@ terraform/*.key
 website/.env.production
 /.idea
 /localdocs
+
+# Optuna
+optuna_studies.db
