@@ -520,7 +520,10 @@ class MiniAmusementPark(gym.Env):
             action_args["price"] = action_args.get("price", 1)
             action_args["order_quantity"] = action_args.get("order_quantity", -1)
         if action_name in ["place", "modify"] and "type" in action_args and action_args["type"] == "ride":
-            action_args["order_quantity"] = action_args.get("order_quantity", -1)
+            action_args["order_quantity"] = -1
+        if action_name == 'modify':
+            action_args["subtype"] = action_args.get("subtype", '')
+            action_args["subclass"] = action_args.get("subclass", '')
 
         # Validate presence of arguments
         action_params = set(action_args.keys())
