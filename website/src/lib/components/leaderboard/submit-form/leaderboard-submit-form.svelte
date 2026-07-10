@@ -106,34 +106,49 @@
         console.log("Submitting manual leaderboard entry");
 
         try {
-            const formData = new FormData();
-            formData.append('parkId', parkId);
-            formData.append('name', name);
-            formData.append('resource_setting', resourceSetting);
-            if (cost !== null) {
-                formData.append('cost', cost.toString());
+            if (!selectedFile) {
+                errorMessage = "Trajectory file is required!";
+                submitting = false;
+                return;
             }
-            if (repoLink.trim()) {
-                formData.append('repoLink', repoLink);
-            }
-            if (paperLink.trim()) {
-                formData.append('paperLink', paperLink);
-            }
-            if (selectedFile) {
-                formData.append('trajectoryFile', selectedFile);
-            }
+
+            const trajectoryContent = await selectedFile.text();
+
+            const payload = {
+                parkId,
+                name,
+                resource_setting: resourceSetting,
+                cost: cost,
+                repoLink: repoLink.trim() || null,
+                paperLink: paperLink.trim() || null,
+                trajectoryFilename: selectedFile.name,
+                trajectory: trajectoryContent
+            };
 
             console.log("Sending request to /api/leaderboard/manual");
 
             const response = await fetch('/api/leaderboard/manual', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
             });
 
             console.log("Response received:", response.status);
 
             if (!response.ok) {
-                const errorData = await response.json();
+                let errorData;
+                try {
+                    const responseText = await response.text();
+                    try {
+                        errorData = JSON.parse(responseText);
+                    } catch {
+                        errorData = { message: responseText };
+                    }
+                } catch {
+                    errorData = { message: "Failed to read error response" };
+                }
                 console.error("Submission failed:", errorData);
                 errorMessage = errorData.message || "Failed to submit entry";
                 submitting = false;

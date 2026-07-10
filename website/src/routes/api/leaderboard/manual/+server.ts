@@ -9,35 +9,32 @@ import type { RequestHandler } from './$types';
  */
 export const POST: RequestHandler = async ({ request }) => {
     try {
-        const formData = await request.formData();
+        const body = await request.json();
 
-        // Extract form fields
-        const parkId = formData.get('parkId') as string;
-        const name = formData.get('name') as string;
-        const resourceSetting = formData.get('resource_setting') as string;
-        const cost = formData.get('cost') as string | null;
-        const repoLink = formData.get('repoLink') as string | null;
-        const paperLink = formData.get('paperLink') as string | null;
-        const trajectoryFile = formData.get('trajectoryFile') as File;
+        const parkId = body.parkId as string;
+        const name = body.name as string;
+        const resourceSetting = body.resource_setting as string;
+        const cost = body.cost as number | null;
+        const repoLink = body.repoLink as string | null;
+        const paperLink = body.paperLink as string | null;
+        const trajectory = body.trajectory as string | undefined;
+        const trajectoryFilename = body.trajectoryFilename as string | undefined;
 
         console.log("Manual submission received:", {
             parkId,
             name,
             resourceSetting,
             cost,
-            hasFile: !!trajectoryFile
+            hasTrajectory: !!trajectory
         });
 
-        // Validate trajectory file
-        if (!trajectoryFile || trajectoryFile.size === 0) {
+        if (!trajectory || trajectory.length === 0) {
             return json({
                 message: "Trajectory file is required"
             }, { status: 400 });
         }
 
-        // Read trajectory file content
-        const trajectoryContent = await trajectoryFile.text();
-        console.log("Trajectory file read, length:", trajectoryContent.length);
+        console.log("Trajectory received, length:", trajectory.length);
 
         // Prepare payload for backend
         const payload = {
@@ -45,12 +42,12 @@ export const POST: RequestHandler = async ({ request }) => {
             is_human: false,
             name,
             resource_setting: resourceSetting,
-            cost: cost ? parseFloat(cost) : null,
+            cost: cost ?? null,
             repoLink: repoLink || null,
             paperLink: paperLink || null,
             validated: false,
-            trajectory: trajectoryContent,
-            trajectoryFilename: trajectoryFile.name,
+            trajectory,
+            trajectoryFilename,
             saveLocal: false,
             saveToCloud: true
         };
